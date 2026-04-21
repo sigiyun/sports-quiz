@@ -89,6 +89,16 @@
   .oxbtn.wrong{background:var(--red-light);border-color:var(--red)}
   .ox-exp{font-size:13px;color:var(--text-sub);padding:10px 12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);margin-bottom:10px;display:none}
   .ox-exp.show{display:block}
+  .know-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:var(--surface);color:var(--text-sub);font-family:inherit;transition:all .15s}
+  .know-btn.known{background:#E1F5EE;color:#085041;border-color:#1D9E75;font-weight:500}
+  .qcard.known-card{opacity:.3;transition:opacity .2s}
+  .qcard.known-card:hover{opacity:.8}
+  .know-bar{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
+  .know-stat{font-size:12px;color:var(--text-sub)}
+  .know-progress{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:80px}
+  .know-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .4s}
+  .hide-known-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:var(--surface);color:var(--text-sub);font-family:inherit;transition:all .15s}
+  .hide-known-btn.active{background:var(--purple);color:#fff;border-color:var(--purple);font-weight:500}
   .footer{text-align:center;padding:1.5rem 1rem;font-size:11px;color:var(--text-sub)}
 </style>
 </head>
@@ -125,7 +135,7 @@
 <div class="hero">
   <span class="hero-emoji">🧗</span>
   <h1>스포츠지도사 구술시험<br>문제은행 최종판</h1>
-  <p>2025 시험문제 + 기출문제 완전 반영 총 <strong style="color:#fff">102문제</strong></p>
+  <p>2025 시험문제 + 기출문제 + 교재 완전 반영 총 <strong style="color:#fff">146문제</strong></p>
   <div class="hero-badges">
     <span class="hero-badge">생활·유소년·노인</span>
     <span class="hero-badge">2025 시험 전범위</span>
@@ -142,6 +152,13 @@
 </div>
 <div class="content">
   <div id="qbank" class="section visible">
+    <!-- 진도 표시 바 -->
+    <div class="know-bar">
+      <span class="know-stat" id="know-stat">학습 진도: 0 / 0</span>
+      <div class="know-progress"><div class="know-fill" id="know-fill" style="width:0%"></div></div>
+      <button class="hide-known-btn" id="hide-known-btn" onclick="toggleHideKnown(this)">✅ 아는 문제 숨기기</button>
+      <button class="hide-known-btn" onclick="resetKnown()" style="color:var(--red);border-color:var(--red)">↺ 초기화</button>
+    </div>
     <div class="filter-scroll">
       <div class="fbtn on" onclick="filterQ(this,'all')">전체</div>
       <div class="fbtn" onclick="filterQ(this,'climbing')">🧗 클라이밍 개념</div>
@@ -173,6 +190,9 @@
         <option value="30">30문제</option>
         <option value="102">전체</option>
       </select>
+      <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--text-sub)">
+        <input type="checkbox" id="skip-known" style="cursor:pointer"> 아는 문제 제외
+      </label>
       <button class="btn-start" onclick="startQuiz()">시작 ▶</button>
     </div>
     <div id="quiz-content"></div>
@@ -276,6 +296,51 @@ const QA=[
 {cat:'gear',q:'8자 매듭(Figure-8 Knot)의 특징과 주의사항을 설명하시오',a:'<ul><li>가장 많이 사용하는 안전 매듭, 강도 우수, 시각적으로 확인이 쉬움</li><li>종류: 8자 연결 매듭, 고리 8자 매듭, 되감기 8자 매듭</li><li>매듭이 가지런해야 하며 보조 매듭(옭매듭) 필수</li><li>남은 로프 끝 5cm 이상 남기기</li></ul>'},
 {cat:'gear',q:'로프 폐기 결정 기준을 설명하시오',a:'<ul><li>심한 추락 후 (특히 계수 1 이상 추락)</li><li>외피 손상 (절단·심한 마모·굳음·꼬임)</li><li>열·화학물질(산성 등) 노출</li><li>수명 기준: 매일 사용 1년, 주말마다 2년, 가끔 4년, 아주 큰 충격 후 즉시 폐기</li></ul>'},
 {cat:'gear',q:'암벽화(Climbing Shoes)의 선택 기준을 설명하시오',a:'<ul><li>적당한 크기 선택 (너무 크면 마찰력 저하, 너무 작으면 고통)</li><li>대상지에 따라 형태 선택: 평발형(넓은 홀드), 굽음형(작은 홀드·발가락 힘)</li><li>UIAA·CE 인증 제품 권장</li></ul>'},
+// ── 스포츠클라이밍의거의모든것 교재 기반 신규 문제 ──
+{cat:'climbing',q:'스포츠 클라이밍을 구성하는 6가지 요소를 설명하시오',a:'<ul><li>① <b>체력:</b> 근력·지구력·유연성·순발력</li><li>② <b>정신력:</b> 공포감 극복·집중력·안정감·동기부여</li><li>③ <b>기술:</b> 등반 기술의 숙련성·기술 조합 능력</li><li>④ <b>개인적 자질:</b> 건강 상태·선천적 학습 능력</li><li>⑤ <b>전략:</b> 등반 경험·지적 능력</li><li>⑥ <b>외부 환경:</b> 바위 형태·날씨·확보물 상태</li></ul>'},
+{cat:'climbing',q:'루트의 난이도를 결정하는 요소를 설명하시오',a:'<ul><li>홀드를 잡기 쉬운지 어려운지 (홀드 형태)</li><li>벽의 경사도: 완만한지 급한지 (수직·오버행)</li><li>홀드 사이의 거리: 가까운지 먼지</li><li>홀드 배치 및 방향</li><li>예) 크림프·슬로퍼 등 익숙하지 않은 홀드, 긴 런지 필요한 구간, 발 홀드가 먼 구간</li></ul>'},
+{cat:'climbing',q:'오픈핸드·풀크림프·하프크림프의 차이와 적합한 상황을 설명하시오',a:'<ul><li><b>오픈핸드:</b> 손을 갈고리처럼 구부려 잡음, 손가락에 부담이 가장 적어 부상 위험↓, 일반적으로 권장</li><li><b>풀크림프:</b> 손가락 관절을 완전히 구부리고 엄지로 잠금, 가장 강한 그립이지만 관절·힘줄 부상 위험 높음</li><li><b>하프크림프:</b> 오픈핸드와 풀크림프의 중간, 작은 홀드에서 사용</li><li>오픈핸드에서 풀크림프보다 약 1.7배 적은 힘으로 홀드를 잡을 수 있음</li></ul>'},
+{cat:'climbing',q:'슬로퍼(Sloper) 홀드를 효율적으로 잡는 방법을 설명하시오',a:'<ul><li>손가락을 크게 벌려 손 전체로 홀드를 감싸듯 잡음(파밍)</li><li>무게중심을 홀드 바로 아래에 오도록 유지</li><li>마찰력을 최대화하기 위해 홀드 바로 밑에서 수직으로 당기기</li><li>자신감을 갖고 과감하게 움직여야 함</li><li>몸 전체로 균형을 맞추는 것이 핵심</li></ul>'},
+{cat:'climbing',q:'언더클링(Under Cling)과 사이드풀(Side Pull)의 사용법을 설명하시오',a:'<ul><li><b>언더클링:</b> 아래를 향한 홀드를 아래에서 위로 잡는 기술, 발로 밀어올리는 힘과 함께 사용, 팔을 곧게 뻗어야 근육 피로 감소, 가장 효율적 높이는 가슴 부근</li><li><b>사이드풀:</b> 옆쪽 방향 홀드를 잡을 때 사용, 손가락과 손바닥 사이에 끼우듯 잡음, 몸의 균형 유지에 활용</li></ul>'},
+{cat:'climbing',q:'개스통(Gaston) 그립이란 무엇인지 설명하시오',a:'<ul><li>사이드풀의 반대 방향 — 손등이 바깥쪽을 향하도록 잡는 그립</li><li>홀드를 바깥쪽으로 밀듯이 잡는 방법</li><li>홀드의 방향이 바깥을 향할 때 또는 몸의 균형을 잡을 때 사용</li><li>어깨 근육을 많이 사용하므로 피로가 빠름</li></ul>'},
+{cat:'climbing',q:'클라이밍의 그레이드 시스템(난이도 체계)을 설명하시오',a:'<ul><li><b>UIAA 등급:</b> 로마 숫자 I~XI, 유럽에서 사용</li><li><b>프랑스 등급:</b> 숫자+알파벳(예: 6a, 7b+), 스포츠클라이밍에서 가장 널리 사용</li><li><b>요세미티 십진법(YDS):</b> 5.0~5.15, 미국식, 5.10a~d처럼 세분화</li><li><b>볼더링 V 그레이드:</b> V0~V17 (Hueco Scale)</li><li><b>폰타블로(Font) 등급:</b> 3~9A, 유럽 볼더링에서 사용</li></ul>'},
+{cat:'climbing',q:'온사이트(On-sight)·플래시(Flash)·레드포인트(Red-point)의 차이를 설명하시오',a:'<ul><li><b>온사이트:</b> 루트에 대한 사전 정보 없이 첫 번째 시도에 완등, 가장 높은 가치</li><li><b>플래시:</b> 다른 사람의 등반 영상이나 조언 등 사전 정보를 가진 상태에서 첫 번째 시도에 완등</li><li><b>레드포인트:</b> 사전 연습 후 추락 없이 완등, 시도 횟수 제한 없음</li></ul>'},
+{cat:'gear',q:'매듭의 종류와 용도를 설명하시오',a:'<ul><li><b>옭매듭(오버헨드):</b> 고리 만들기 또는 다른 매듭의 끝 처리용</li><li><b>8자 매듭:</b> 가장 강한 매듭, 안전벨트에 로프 연결, 충격 후에도 쉽게 풀 수 있음</li><li><b>되감기 8자 매듭:</b> 로프 끝을 안전벨트에 직접 묶는 가장 확실한 방법</li><li><b>이중 피셔맨 매듭:</b> 두 로프를 연결할 때, 가장 확실하나 충격 후 풀기 어려움</li><li><b>테이프 매듭(물 매듭):</b> 슬링·웨빙 연결용, 시간이 지나면 느슨해지므로 자주 확인 필요</li><li><b>보울라인 매듭:</b> 나무나 확보물에 로프를 묶을 때, 끝 처리 필수</li></ul>'},
+{cat:'gear',q:'확보(Belay)의 원리와 확보자의 역할을 설명하시오',a:'<ul><li>확보: 등반자가 추락했을 때 로프를 잡아주어 부상을 방지하는 안전 시스템</li><li>확보자는 항상 로프에서 손을 놓지 않아야 함 (제동손 유지)</li><li>등반자의 위치와 움직임에 따라 로프를 지속적으로 당기거나 풀어줌</li><li>추락 시 동적으로 로프를 제동하여 충격력 감소</li><li>선등 확보: 등반자가 위에 있을 때 로프를 관리</li><li>후등 확보: 등반자가 아래에 있을 때 로프를 당겨올림</li></ul>'},
+{cat:'gear',q:'하강(Rappel)의 원리와 안전한 하강 방법을 설명하시오',a:'<ul><li>하강기(디바이스)의 마찰력을 이용하여 로프를 타고 내려오는 방법</li><li>제동손으로 로프를 잡는 힘으로 속도 조절</li><li>하강 전: 로프가 확보물을 완전히 통과했는지 확인</li><li>하강 중: 발을 벽에 대고 상체를 직각에 가깝게 유지</li><li>속도: 천천히 일정한 속도로 하강 (초속 3m 이내)</li><li>반드시 장갑 착용 권장 (마찰열 방지)</li></ul>'},
+{cat:'gear',q:'선등(Lead Climbing)의 특징과 주의사항을 설명하시오',a:'<ul><li>선등: 확보물이 없는 상태에서 앞서 올라가며 퀵드로에 로프를 걸면서 등반</li><li>추락 시 마지막 퀵드로까지의 거리 × 2만큼 추락 (추락 계수)</li><li>첫 번째 볼트 통과 전: 바닥 추락 위험, 스포팅 필수</li><li>로프는 항상 몸 앞쪽(벽 쪽)에 위치해야 함</li><li>퀵드로는 아래부터 순차적으로 클립, Z클립 발생 시 즉시 수정</li><li>추락 시 로프가 다리에 감기지 않도록 주의</li></ul>'},
+{cat:'gear',q:'추락(Fall)의 종류와 안전한 추락 방법을 설명하시오',a:'<ul><li><b>추락 계수:</b> 추락 거리 ÷ 로프 길이, 높을수록 충격 큼 (최대 2)</li><li><b>동적 추락:</b> 로프가 충격을 흡수하는 안전한 추락</li><li><b>안전한 추락법:</b> 팔다리를 적당히 구부리고 근육을 긴장시켜 충격 분산</li><li>머리가 아래로 향하지 않도록 주의</li><li>홀드나 퀵드로에 손발이 걸리지 않도록</li><li>빌레이어는 동적 확보로 충격력 최소화</li></ul>'},
+{cat:'gear',q:'톱로핑(Top Roping)이란 무엇인지 설명하시오',a:'<ul><li>로프의 한쪽 끝이 루트 최상단 확보물에 연결된 상태에서 등반하는 방식</li><li>추락 시 최대 추락 거리 = 0 (로프가 항상 위에서 잡아줌)</li><li>가장 안전한 등반 방식으로 초보자 훈련에 적합</li><li>스피드 경기에서 오토빌레이 시스템을 활용한 톱로핑 방식 사용</li><li>선등보다 부상 위험 낮음</li></ul>'},
+{cat:'safety',q:'클라이밍 훈련에서 오버트레이닝(과훈련)의 증상과 예방법을 설명하시오',a:'<ul><li><b>증상:</b> 성적 하락, 피로 누적, 동기부여 감소, 부상 빈도↑, 수면 장애</li><li><b>원인:</b> 회복 시간 없이 고강도 훈련 반복</li><li><b>예방:</b> 훈련과 휴식의 균형 유지, 주기화 훈련(훈련 강도를 주기적으로 조절)</li><li>충분한 수면, 영양 보충 필수</li><li>통증·피로 신호 무시하지 않기</li></ul>'},
+{cat:'safety',q:'클라이밍에서 발생하는 주요 부상 부위와 원인을 설명하시오',a:'<ul><li><b>손가락:</b> 활차 파열, 힘줄 손상 — 크림프 남용, 웜업 부족</li><li><b>어깨:</b> 회전근개 부상 — 런지·다이노 등 순간 하중 동작</li><li><b>팔꿈치:</b> 내측상과염(골프엘보), 외측상과염(테니스엘보) — 근력 불균형</li><li><b>손목:</b> 삼각섬유연골 손상 — 과도한 손목 회전</li><li><b>무릎:</b> 힐훅·드롭니 과사용</li><li>공통 예방법: 충분한 워밍업, 점진적 강도 증가, 오픈핸드 위주 훈련</li></ul>'},
+{cat:'nutrition',q:'클라이밍 선수의 체지방 관리가 중요한 이유를 설명하시오',a:'<ul><li>클라이밍은 자신의 체중을 끌어올려야 하는 스포츠 → 체중 대비 근력(PWR) 중요</li><li>과도한 체지방은 등반 능력 저하, 관절·힘줄 부담 증가</li><li>단, 지나친 체중 감량은 근력·면역력 저하, 부상 위험↑</li><li>건강한 체지방 유지 + 근육량 극대화가 목표</li><li>BMI보다 체성분 분석(근육·지방 비율)이 중요</li></ul>'},
+{cat:'nutrition',q:'클라이밍 훈련에서 회복 주기(단기·중기·장기)를 설명하시오',a:'<ul><li><b>단기 회복(즉각적, 훈련 후):</b> 영양 보충(탄수화물+단백질), 충분한 수분, 스트레칭, 아이싱</li><li><b>중기 회복(24~72시간):</b> 충분한 수면, 가벼운 유산소 운동으로 혈액순환 촉진</li><li><b>장기 회복(1주일~):</b> 훈련 강도 감소 주(Deload Week), 심리적 재충전</li><li>회복이 충분해야 훈련 효과(초과 회복)가 나타남</li></ul>'},
+{cat:'safety',q:'클라이밍에서 유연성 훈련(스트레칭)의 종류와 방법을 설명하시오',a:'<ul><li><b>정적 스트레칭:</b> 자세를 유지하며 천천히 늘리기 (20~30초), 훈련 후 정리운동에 적합</li><li><b>동적 스트레칭:</b> 관절을 동적으로 움직이며 가동 범위 확대, 훈련 전 워밍업에 적합</li><li>주요 부위: 어깨·손목·손가락·허리·골반·햄스트링·발목</li><li>클라이밍에서 유연성↑ → 멀리 있는 홀드 도달, 드롭니·힐훅 동작 효율 증가</li></ul>'},
+{cat:'climbing',q:'클라이밍에서 무게중심(Center of Gravity)의 중요성을 설명하시오',a:'<ul><li>무게중심을 발 위에 올려놓아야 팔의 부담이 줄어듦</li><li>무게중심이 벽에 가까울수록 팔에 걸리는 하중 감소</li><li>홀드 위치에 따라 몸을 좌우로 회전시켜 무게중심 이동</li><li>밸런스 유지 = 무게중심을 기저면(손·발이 만드는 면) 위에 유지</li><li>슬로퍼 홀드: 무게중심을 홀드 바로 아래에 위치시키는 것이 핵심</li></ul>'},
+{cat:'climbing',q:'핑거보드(Fingerboard) 훈련의 목적과 올바른 사용법을 설명하시오',a:'<ul><li><b>목적:</b> 손가락 근력 강화, 크림프·오픈핸드·핀치 등 다양한 그립 훈련</li><li>초보자는 사용 금지 — 손가락 힘줄 발달이 덜 된 상태에서 과부하 → 파열 위험</li><li>최소 1~2년 이상 등반 경험 후 사용 권장</li><li>충분한 워밍업 후 사용, 통증 시 즉시 중단</li><li>오픈핸드 위주로 훈련하여 부상 최소화</li></ul>'},
+{cat:'climbing',q:'클라이밍에서 정신 훈련(멘탈 트레이닝)의 중요성을 설명하시오',a:'<ul><li>공포감(추락에 대한 두려움)은 기술 수행을 방해하고 근력 소모를 증가시킴</li><li><b>시각화(Visualization):</b> 등반 전 루트를 머릿속으로 완등하는 연습</li><li><b>집중력 훈련:</b> 현재 홀드에만 집중, 잡념 제거</li><li>추락 훈련: 안전한 환경에서 의도적으로 추락하여 추락에 대한 두려움 극복</li><li>루틴(습관화): 등반 전 일정한 준비 루틴으로 심리 안정</li></ul>'},
+// ── 클라이밍교과서 기반 신규 문제 ──
+{cat:'climbing',q:'홀드의 종류(그립 방식)를 설명하시오',a:'<ul><li><b>오픈핸드(저그):</b> 손끝을 홀드에 걸고 손가락 관절을 쭉 펴서 매달림, 초보자용·대형 홀드</li><li><b>크림프:</b> 손가락 관절을 구부려 세게 잡는 방식, 작은 홀드에 유리하나 부상 위험↑</li><li><b>핀치:</b> 엄지와 나머지 손가락으로 홀드를 집듯 잡음</li><li><b>포켓:</b> 구멍 홀드에 손가락 1~3개 삽입</li><li><b>슬로퍼:</b> 미끄럽고 둥그스름한 홀드, 손 전체를 감싸듯 쥠</li><li><b>언더클링:</b> 아래쪽 방향 홀드를 아래에서 위로 잡음, 발로 밀어올리는 힘과 함께 사용</li><li><b>사이드풀:</b> 옆쪽 방향 홀드를 잡을 때, 몸의 균형 유지에 활용</li></ul>'},
+{cat:'climbing',q:'인사이드 스텝과 아웃사이드 스텝의 차이를 설명하시오',a:'<ul><li><b>인사이드 스텝:</b> 발의 엄지발가락 쪽(인사이드 에지)으로 홀드를 딛는 방법, 가장 기본적인 발 동작, 안정적인 자세 유지에 유리</li><li><b>아웃사이드 스텝:</b> 발의 새끼발가락 쪽(아웃사이드 에지)으로 홀드를 딛는 방법, 트위스트 동작과 함께 사용, 멀리 있는 홀드에 닿을 때 효과적</li></ul>'},
+{cat:'climbing',q:'플래깅(Flagging) 기술을 설명하시오',a:'<ul><li>균형을 잃을 것 같을 때 한쪽 발을 허공에 뻗어 균형을 잡는 기술</li><li><b>인사이드 플래깅:</b> 발을 안쪽으로 교차시켜 균형 유지, 멀리 있는 홀드 잡을 때 효과적</li><li><b>아웃사이드 플래깅:</b> 발을 바깥쪽으로 뻗어 균형 유지</li><li>팔을 멀리 뻗어야 할 때 추락 방지에 유용</li></ul>'},
+{cat:'climbing',q:'드롭니(Drop Knee) 기술을 설명하시오',a:'<ul><li>한쪽 무릎을 아래로 떨어뜨리면서 몸을 벽에 밀착시키는 기술</li><li>아웃사이드 스텝의 응용 동작</li><li>벽에 몸을 바짝 붙여 작은 홀드를 이용하기 용이</li><li>과도한 사용 시 무릎 관절에 부담 — 관절 가동 범위 주의</li></ul>'},
+{cat:'climbing',q:'힐훅(Heel Hook)과 토훅(Toe Hook)의 차이를 설명하시오',a:'<ul><li><b>힐훅:</b> 발꿈치를 홀드나 벽에 걸어 당기는 기술, 오버행에서 몸을 끌어올릴 때 사용</li><li><b>토훅:</b> 발끝(발가락 부분)을 홀드에 걸어 당기는 기술, 몸이 벽에서 떨어지는 것을 방지</li><li>두 기술 모두 팔의 부담을 줄이고 하체를 활용하는 기술</li></ul>'},
+{cat:'climbing',q:'다이노(Dyno)와 데드포인트(Dead Point)의 차이를 설명하시오',a:'<ul><li><b>데드포인트:</b> 점프 후 최고점(모멘텀이 0이 되는 순간)에 홀드를 잡는 기술, 발이 벽에 붙어 있음</li><li><b>다이노:</b> 두 손과 두 발을 모두 떼고 점프하여 멀리 있는 홀드를 잡는 동적 기술</li><li>다이노에서는 접촉 근력(contact strength)이 중요 — 홀드를 잡는 순간 꽉 움켜쥐는 힘</li></ul>'},
+{cat:'climbing',q:'맨틀링(Mantling) 기술을 설명하시오',a:'<ul><li>홀드 위에 손을 짚고 몸을 밀어올려 홀드 위에 서는 기술</li><li>야외 볼더링에서 볼더 꼭대기에 올라설 때 자주 사용</li><li>실내에서는 볼륨 홀드를 이용한 맨틀링 연습 가능</li><li>어깨와 코어 근력이 중요</li></ul>'},
+{cat:'climbing',q:'풋워크(발 동작)의 중요성과 기본 원칙을 설명하시오',a:'<ul><li>풋워크는 균형 잡힌 자세의 기본</li><li>발끝으로 정확하게 홀드를 딛어야 체중 이동이 원활</li><li>발바닥 전체로 딛지 않고 신발 끝(토 박스)으로 딛기</li><li>스미어링: 마찰력을 이용해 벽면을 발바닥 전체로 딛는 방법</li><li>풋워크가 좋으면 팔의 부담이 줄어 오래 등반 가능</li></ul>'},
+{cat:'climbing',q:'스메어링(Smearing) 기술을 설명하시오',a:'<ul><li>발끝이 닿을 홀드가 없을 때 신발 밑창의 마찰력을 이용해 벽면을 딛는 기술</li><li>둥그스름한 풋홀드나 홀드가 없는 벽면에서 사용</li><li>신발 밑창을 최대한 벽에 밀착시켜 마찰력 확보</li><li>부드럽고 마찰력 좋은 암벽화가 효과적</li></ul>'},
+{cat:'climbing',q:'쉽게 오르기 위한 무브의 기본 원칙 4가지를 설명하시오',a:'<ul><li>① <b>팔을 펴기:</b> 항상 팔을 쭉 펴서 근육 긴장을 최소화 (구부린 팔은 빠르게 피로)</li><li>② <b>발 사용 극대화:</b> 다리와 발로 체중을 지지하고 팔은 균형용으로 활용</li><li>③ <b>무게중심을 벽에 가깝게:</b> 몸을 벽에 밀착시켜 팔에 걸리는 하중 감소</li><li>④ <b>발 바꾸기:</b> 다음 홀드 방향에 맞게 발을 미리 바꿔 효율적인 자세 유지</li></ul>'},
+{cat:'climbing',q:'볼더링에서 발 바꾸기(Foot Switch) 방법을 설명하시오',a:'<ul><li><b>점프 바꾸기:</b> 풋홀드에서 폴짝 뛰면서 발을 교체하는 방법, 빠르지만 균형 잃기 쉬움</li><li><b>밀어 바꾸기(Match):</b> 두 발을 같은 홀드에 모은 후 한 발을 옮기는 방법</li><li><b>돌려 바꾸기:</b> 발을 홀드 위에서 회전시켜 교체하는 방법</li><li>정확한 발 바꾸기는 에너지 절약과 다음 무브 연결에 핵심</li></ul>'},
+{cat:'safety',q:'테이핑(Taping)의 효과와 목적을 설명하시오',a:'<ul><li><b>목적:</b> 부상 예방, 부상 부위 고정·보호, 재활 운동 중 지지</li><li><b>효과:</b> 손가락 관절 동작 제한으로 과도한 부하 방지</li><li><b>크림프 그립 제한 테이핑:</b> 손가락 안쪽에서 손바닥 방향으로 X자 감기 → 강한 크림프 차단</li><li><b>주의:</b> 테이프 마찰력이 피부보다 약해 미끄러운 홀드 잡기 어려울 수 있음</li><li>손가락에 이상이 생기면 즉시 등반 중단</li></ul>'},
+{cat:'safety',q:'올바른 아이싱(Icing) 방법을 설명하시오',a:'<ul><li><b>목적:</b> 부상 응급처치, 염증·부기 완화, 등반 후 손가락 피로 회복</li><li><b>방법:</b> 얼음물에 손 전체를 담그는 것보다 아픈 부위만 냉각</li><li><b>시간:</b> 10~15분 적용, 피부가 붉어지거나 저릴 때 중단</li><li><b>주의:</b> 감각이 없어질 때까지 아이싱하지 않기, 직접 얼음을 피부에 대지 않기</li><li>등반 후 손가락이 아플 때 얼음물에 담그면 염증 진행 완화</li></ul>'},
+{cat:'safety',q:'클라이밍에서 손가락 부상이 많은 이유와 예방법을 설명하시오',a:'<ul><li><b>이유:</b> 등반 하중의 대부분이 손가락에 집중, 혈관 적어 회복 느림</li><li>A2·A4 활차(손가락 힘줄 고정 조직)에 가장 많이 발생</li><li>크림프 그립이 가장 큰 부상 원인</li><li><b>예방:</b> 충분한 워밍업·스트레칭, 오픈핸드 그립 위주 훈련</li><li>통증 발생 시 즉시 등반 중단, 아이싱 실시</li><li>강한 크림프 제한 테이핑 활용</li></ul>'},
+{cat:'safety',q:'등반 전 워밍업의 중요성과 방법을 설명하시오',a:'<ul><li><b>중요성:</b> 부상 예방의 핵심, 차가운 근육·힘줄에 갑작스러운 부하 → 파열 위험</li><li><b>방법:</b> 가벼운 유산소 운동(5분) → 동적 스트레칭 → 쉬운 과제부터 시작</li><li>특히 손가락 마사지: 손가락을 오므렸다 펴기 반복</li><li>본격 등반 전 최소 15~20분 워밍업 권장</li><li>워밍업 없이 어려운 과제 바로 도전 → 부상 위험 급증</li></ul>'},
+{cat:'gear',q:'클라이밍 슈즈의 종류와 특징을 설명하시오',a:'<ul><li><b>플랫(평발형):</b> 밑창이 평평, 초보자·장시간 등반에 편안, 넓은 홀드에 유리</li><li><b>미들컷:</b> 발볼이 약간 구부러진 형태, 중급자용, 범용성 좋음</li><li><b>다운턴(굽음형):</b> 앞부분이 아래로 구부러진 형태, 발가락 힘 극대화, 작은 홀드·오버행에 유리</li><li>발 모양에 맞는 슈즈 선택이 중요, 처음엔 조금 편한 것 선택 권장</li></ul>'},
+{cat:'gear',q:'초크(Chalk)와 초크백의 올바른 사용법을 설명하시오',a:'<ul><li><b>초크 역할:</b> 손의 땀을 흡수하여 홀드 마찰력 증가</li><li>과도한 사용은 다른 등반자에게 피해 → 필요한 양만 사용</li><li>초크백을 허리에 차고 등반 중 필요할 때 손가락을 담가 사용</li><li>볼더링에서 홀드에 초크 자국이 루트 분석에 도움이 되기도 함</li><li>실내에서는 액상 초크 또는 승인된 초크만 사용</li></ul>'},
+{cat:'climbing',q:'볼더링의 난이도 체계(그레이드)를 설명하시오',a:'<ul><li><b>V 그레이드(Hueco Scale):</b> V0~V17, 숫자가 높을수록 어려움, 세계적으로 가장 많이 사용</li><li><b>Font(폰타블로) 그레이드:</b> 3~9A, 유럽에서 주로 사용, 숫자+알파벳 조합</li><li>국내 실내 짐에서는 테이프 색상으로 난이도 구분 (시설마다 다름)</li><li>같은 그레이드라도 홀드 종류·벽 각도에 따라 체감 난이도 다름</li></ul>'},
+{cat:'climbing',q:'볼더링 과제(문제)를 분석하는 방법(루트 리딩)을 설명하시오',a:'<ul><li>출발 홀드부터 완등 홀드까지 이동 경로 파악</li><li>어떤 그립(오픈핸드·크림프·언더클링 등)을 사용할지 분석</li><li>핵심 무브(어려운 구간) 파악 후 해결 방법 구상</li><li>발 위치와 발 바꾸기 시점 미리 계획</li><li>다른 클라이머의 등반 관찰로 힌트 얻기 가능</li></ul>'},
+{cat:'climbing',q:'오버행(Overhang) 벽에서 효율적으로 등반하는 방법을 설명하시오',a:'<ul><li>팔을 최대한 펴서 매달리는 시간 최소화</li><li>힐훅·토훅으로 하체를 활용해 팔 부담 감소</li><li>드롭니로 몸을 벽에 밀착시켜 무게중심 유지</li><li>빠른 클립과 동작으로 에너지 소모 최소화</li><li>코어(몸통) 근력 활용으로 몸이 벽에서 떨어지는 것(바나나 자세) 방지</li></ul>'},
+{cat:'safety',q:'클라이밍 센터 이용 기본 매너와 안전 수칙을 설명하시오',a:'<ul><li>등반 전 상하좌우 확인, 다른 등반자와의 간섭 주의</li><li>등반 벽 아래 착석 금지, 이동 시 벽 아래로 지나지 않기</li><li>추락 시 뛰어내리지 않고 자연스럽게 매트에 착지</li><li>홀드·장비 파손 발견 시 즉시 직원에게 신고</li><li>과제 설명 없이 다른 사람 등반 방해 금지</li><li>초크 과다 사용 자제</li></ul>'},
 ];
 
 const OX=[
@@ -304,6 +369,10 @@ const OX=[
   {q:'리드 경기 등반 허용시간은 6분이며 심판위원장의 재량으로 변경 가능하다',a:true,ex:'리드 경기 등반 허용시간은 6분, 심판위원장 재량으로 변경 가능하다.'},
   {q:'스피드 경기는 탑로핑 방식으로 진행된다',a:true,ex:'스피드 경기는 IFSC·대산련 승인 오토빌레이 시스템을 사용한 탑로핑 방식으로 진행된다.'},
   {q:'볼더링 등반 중 출발 홀드를 잡기 위해 벽 표면을 사용할 수 있다',a:true,ex:'출발 홀드를 잡기 위해 벽 표면을 사용하는 것은 허용된다.'},
+  {q:'오픈핸드 그립은 풀크림프보다 손가락에 가해지는 부담이 적다',a:true,ex:'오픈핸드는 풀크림프보다 약 1.7배 적은 힘으로 홀드를 잡을 수 있어 부상 위험이 낮다.'},
+  {q:'되감기 8자 매듭에서 로프 끝을 옭매듭으로 마무리하지 않아도 된다',a:false,ex:'되감기 8자 매듭을 한 다음에도 반드시 로프 끝을 옭매듭으로 마무리해야 안전하다.'},
+  {q:'선등(리드)에서 추락 계수가 높을수록 추락 충격이 크다',a:true,ex:'추락 계수 = 추락 거리 ÷ 로프 길이, 값이 클수록 충격 큼. 최대값은 2이다.'},
+  {q:'온사이트(On-sight)는 루트에 대한 사전 정보를 가진 상태에서 첫 번째 시도에 완등하는 것이다',a:false,ex:'온사이트는 루트에 대한 사전 정보 없이 첫 번째 시도에 완등. 사전 정보가 있는 경우는 플래시(Flash)이다.'},
 ];
 
 let quizData=[],quizIdx=0,quizScore=0,quizAnswered=false;
@@ -318,16 +387,89 @@ function showTab(id,el){
   if(id==='ox')startOX();
 }
 function catBadge(cat){return `<span class="badge ${BADGE[cat]||'b-c'}">${CAT[cat]||cat}</span>`;}
+// ── 알고 있어요 기능 ──
+let knownSet = new Set(JSON.parse(localStorage.getItem('knownQ') || '[]'));
+let hideKnown = false;
+let currentCat = 'all';
+
+function saveKnown(){ try{ localStorage.setItem('knownQ', JSON.stringify([...knownSet])); }catch(e){} }
+
+function toggleKnown(idx, btn, card){
+  if(knownSet.has(idx)){
+    knownSet.delete(idx);
+    btn.textContent = '✅ 알고 있어요';
+    btn.classList.remove('known');
+    card.classList.remove('known-card');
+  } else {
+    knownSet.add(idx);
+    btn.textContent = '✅ 알고 있음!';
+    btn.classList.add('known');
+    card.classList.add('known-card');
+    if(hideKnown) card.style.display = 'none';
+  }
+  saveKnown();
+  updateKnowBar();
+}
+
+function toggleHideKnown(btn){
+  hideKnown = !hideKnown;
+  btn.classList.toggle('active', hideKnown);
+  btn.textContent = hideKnown ? '👁 전체 보기' : '✅ 아는 문제 숨기기';
+  document.querySelectorAll('.qcard').forEach(card => {
+    if(card.classList.contains('known-card')){
+      card.style.display = hideKnown ? 'none' : 'block';
+    }
+  });
+  updateKnowBar();
+}
+
+function resetKnown(){
+  if(!confirm('학습 진도를 초기화할까요?')) return;
+  knownSet.clear();
+  saveKnown();
+  renderQBank(currentCat);
+}
+
+function updateKnowBar(){
+  const list = currentCat === 'all' ? QA : QA.filter(q => q.cat === currentCat);
+  const total = list.length;
+  const known = list.filter((_, i) => {
+    const globalIdx = currentCat === 'all' ? i : QA.indexOf(list[i]);
+    return knownSet.has(currentCat === 'all' ? i : globalIdx);
+  }).length;
+  // 전체 기준으로 카운트
+  const knownAll = [...knownSet].filter(i => {
+    if(currentCat === 'all') return true;
+    return QA[i] && QA[i].cat === currentCat;
+  }).length;
+  const pct = total > 0 ? Math.round(knownAll / total * 100) : 0;
+  document.getElementById('know-stat').textContent = `학습 진도: ${knownAll} / ${total} (${pct}%)`;
+  document.getElementById('know-fill').style.width = pct + '%';
+  const visibleCount = total - (hideKnown ? knownAll : 0);
+  document.getElementById('qcount').textContent = `${visibleCount}문제 표시 중 (전체 ${total}문제)`;
+}
+
 function renderQBank(cat='all'){
-  const list=cat==='all'?QA:QA.filter(q=>q.cat===cat);
-  document.getElementById('qcount').textContent=`총 ${list.length}문제`;
-  document.getElementById('qlist').innerHTML=list.map((item,i)=>`
-    <div class="qcard">
+  currentCat = cat;
+  const list = cat === 'all' ? QA : QA.filter(q => q.cat === cat);
+  document.getElementById('qlist').innerHTML = list.map((item, i) => {
+    const globalIdx = QA.indexOf(item);
+    const isKnown = knownSet.has(globalIdx);
+    return `
+    <div class="qcard${isKnown ? ' known-card' : ''}" style="${isKnown && hideKnown ? 'display:none' : ''}">
       <div class="qhead"><span class="qnum">Q${i+1}</span><div class="qtxt">${item.q}</div></div>
-      <div class="qmeta">${catBadge(item.cat)}</div>
+      <div class="qmeta" style="justify-content:space-between;display:flex;align-items:center">
+        ${catBadge(item.cat)}
+        <button class="know-btn${isKnown ? ' known' : ''}"
+          onclick="toggleKnown(${globalIdx}, this, this.closest('.qcard'))">
+          ${isKnown ? '✅ 알고 있음!' : '✅ 알고 있어요'}
+        </button>
+      </div>
       <button class="abtn" onclick="toggleAns(this)">▶ 정답 보기</button>
       <div class="answer">${item.a}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+  updateKnowBar();
 }
 function toggleAns(btn){
   const a=btn.nextElementSibling;
@@ -340,11 +482,24 @@ function filterQ(btn,cat){
   renderQBank(cat);
 }
 function startQuiz(){
-  const cat=document.getElementById('qcat')?.value||'all';
-  const num=parseInt(document.getElementById('qnum')?.value||'10');
-  let pool=cat==='all'?[...QA]:QA.filter(q=>q.cat===cat);
-  quizData=pool.sort(()=>Math.random()-.5).slice(0,Math.min(num,pool.length));
-  quizIdx=0;quizScore=0;renderQuiz();
+  const cat = document.getElementById('qcat')?.value || 'all';
+  const num = parseInt(document.getElementById('qnum')?.value || '10');
+  const skipKnown = document.getElementById('skip-known')?.checked || false;
+  let pool = cat === 'all' ? [...QA] : QA.filter(q => q.cat === cat);
+  // 아는 문제 제외 옵션
+  if(skipKnown){
+    pool = pool.filter(item => !knownSet.has(QA.indexOf(item)));
+    if(pool.length === 0){
+      document.getElementById('quiz-content').innerHTML =
+        `<div class="scorebox"><span class="score-emoji">🎉</span>
+        <div class="scorenum" style="font-size:20px">모든 문제를 알고 있어요!</div>
+        <div class="scoretext" style="margin-top:8px">문제은행에서 초기화 후 다시 도전하세요</div></div>`;
+      return;
+    }
+  }
+  quizData = pool.sort(() => Math.random() - .5).slice(0, Math.min(num, pool.length));
+  quizIdx = 0; quizScore = 0;
+  renderQuiz();
 }
 // li 항목들을 짧게 추출 — i번째 항목 반환
 function getLiText(html, idx) {
