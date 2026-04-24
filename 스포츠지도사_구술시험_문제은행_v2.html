@@ -452,7 +452,8 @@ renderQBank('all');
 </script>
 </div>
 <script>
-// ── 개인별 코드 설정 ──────────────────────────────
+<script>
+// ── 수강생 코드 ──────────────────────────
 const STUDENT_CODES = {
   'kim-4493': '김진호',
   'oh-4946':  '오혜진',
@@ -465,198 +466,52 @@ const STUDENT_CODES = {
   'hong-2269':'홍승우',
 };
 const FB_URL = 'https://sports-quiz-60fae-default-rtdb.firebaseio.com';
-const MAX_FAIL = 5;        // 로그인 실패 허용 횟수
-const FAIL_LOCK = 10;      // 잠금 시간 (분)
-const SESSION_TIMEOUT = 5; // 세션 만료 시간 (분)
-const HEARTBEAT_SEC = 30;  // 하트비트 간격 (초)
-// ──────────────────────────────────────────────────
+// ─────────────────────────────────────────
 
-let sessionToken = null;
-let heartbeatTimer = null;
-let watchTimer = null;
-let currentPw = null;
-let loginStartTime = null;
-
-// 기기 정보 상세
-function getDevice(){
-  const ua = navigator.userAgent;
-  if(/iPad/.test(ua)) return 'iPad';
-  if(/iPhone/.test(ua)) return 'iPhone';
-  if(/Android/.test(ua)) return 'Android';
-  return 'PC';
-}
-
-// 현재 시간 문자열
-function nowStr(){
-  const n = new Date();
-  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+
-    String(n.getDate()).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+
-    String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
-}
-
-// Firebase REST 헬퍼
-async function fbGet(path){
-  const r = await fetch(`${FB_URL}/${path}.json`);
-  return r.ok ? r.json() : null;
-}
-async function fbSet(path, data){
-  await fetch(`${FB_URL}/${path}.json`,{
-    method:'PUT', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(data)
-  });
-}
-async function fbPush(path, data){
-  await fetch(`${FB_URL}/${path}.json`,{
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(data)
-  });
-}
-async function fbDelete(path){
-  await fetch(`${FB_URL}/${path}.json`,{method:'DELETE'});
-}
-
-function enterApp(){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('main-content').style.display='block';
-  loginStartTime = Date.now();
-}
-
-function showError(msg){
-  const err = document.getElementById('login-err');
-  const btn = document.querySelector('#login-screen button');
-  err.innerHTML = msg.replace(/\n/g,'<br>');
-  btn.textContent = '입장하기';
-  btn.disabled = false;
-}
-
-async function tryLogin(){
+function tryLogin(){
   const name = document.getElementById('login-name').value.trim();
   const pw   = document.getElementById('login-pw').value.trim();
   const err  = document.getElementById('login-err');
-  const btn  = document.querySelector('#login-screen button');
 
+  // 빈칸 확인
   if(!name){ err.textContent='이름을 입력해 주세요.'; return; }
   if(!pw)  { err.textContent='비밀번호를 입력해 주세요.'; return; }
 
-  // ① 코드 유효성 확인
+  // 코드 확인
   if(!STUDENT_CODES[pw]){
     err.textContent='비밀번호가 올바르지 않습니다.';
     document.getElementById('login-pw').value='';
-    document.getElementById('login-pw').focus();
     return;
   }
 
-  // ② 이름-코드 일치 확인
+  // 이름 확인
   if(STUDENT_CODES[pw] !== name){
     err.textContent='이름이 코드와 일치하지 않습니다.';
     return;
   }
 
-  btn.textContent='확인 중...';
-  btn.disabled=true;
-  err.innerHTML='';
+  // 입장
+  err.textContent='';
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-content').style.display='block';
 
-  const time = nowStr();
-  const device = getDevice();
-  const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
-  const sessionKey = pw.replace(/-/g,'_');
-
-  try {
-    // ③ 로그인 실패 잠금 확인
-    const failData = await fbGet(`fails/${sessionKey}`);
-    if(failData && failData.count >= MAX_FAIL){
-      const lockUntil = failData.lockedAt + FAIL_LOCK * 60 * 1000;
-      if(Date.now() < lockUntil){
-        const remain = Math.ceil((lockUntil - Date.now()) / 60000);
-        showError(`⛔ 로그인 시도 초과로 ${remain}분간 잠금됩니다.\n강사님께 문의하세요.`);
-        return;
-      } else {
-        await fbDelete(`fails/${sessionKey}`); // 잠금 해제
-      }
-    }
-
-    // ④ 현재 세션 확인 (동시 접속 차단)
-    const existing = await fbGet(`sessions/${sessionKey}`);
-    if(existing && existing.token){
-      const elapsed = Date.now() - (existing.lastBeat || 0);
-      if(elapsed < SESSION_TIMEOUT * 60 * 1000){
-        // 활성 세션 존재 → 차단 + 로그 기록
-        await fbPush('alerts', {
-          name, time, device,
-          msg: `⚠️ 동시접속 시도: ${name} (${device})`,
-          existingDevice: existing.device
-        });
-        showError(`⚠️ 이미 다른 기기(${existing.device})에서 접속 중입니다.\n해당 기기를 종료 후 다시 시도하거나\n강사님께 문의하세요.`);
-        return;
-      }
-    }
-
-    // ⑤ 기기 변경 감지
-    const lastLog = await fbGet(`lastDevice/${sessionKey}`);
-    let deviceChangeMsg = '';
-    if(lastLog && lastLog.device && lastLog.device !== device){
-      deviceChangeMsg = ` [기기변경: ${lastLog.device}→${device}]`;
-      await fbPush('alerts', {{
-        name, time, device,
-        msg: `📱 기기변경 감지: ${name} (${lastLog.device} → ${device})`
-      }});
-    }
-
-    // ⑥ 새 세션 등록
-    await fbSet(`sessions/${sessionKey}`, {
-      name, token, time, device,
-      lastBeat: Date.now()
-    });
-
-    // ⑦ 접속 로그 기록 (학습 시간 추적용)
-    await fbPush('logs', {
-      name, time, device,
-      action: 'login' + deviceChangeMsg
-    });
-
-    // ⑧ 마지막 기기 갱신
-    await fbSet(`lastDevice/${sessionKey}`, { device, time });
-
-    // ⑨ 실패 기록 초기화
-    await fbDelete(`fails/${sessionKey}`);
-
-    sessionToken = token;
-    currentPw = sessionKey;
-
-    // ⑩ 하트비트 — 30초마다 세션 갱신 + 강제 로그아웃 감지
-    heartbeatTimer = setInterval(async ()=>{
-      try{
-        const cur = await fbGet(`sessions/${sessionKey}`);
-        if(!cur || cur.token !== sessionToken){
-          clearInterval(heartbeatTimer);
-          alert('⚠️ 관리자에 의해 접속이 종료되었습니다.');
-          location.reload();
-          return;
-        }
-        await fbSet(`sessions/${sessionKey}/lastBeat`, Date.now());
-      } catch(e){}
-    }, HEARTBEAT_SEC * 1000);
-
-    // ⑪ 학습 시간 측정 (퇴장 시 기록)
-    window.addEventListener('beforeunload', async ()=>{
-      const studyMin = Math.round((Date.now() - loginStartTime) / 60000);
-      navigator.sendBeacon(
-        `${FB_URL}/logs.json`,
-        JSON.stringify({ name, time: nowStr(), device, action:'logout', studyMin })
-      );
-      navigator.sendBeacon(
-        `${FB_URL}/sessions/${sessionKey}.json`,
-        JSON.stringify(null)
-      );
-    });
-
-    enterApp();
-
-  } catch(e){
-    // Firebase 오류 시 — 코드·이름 확인됐으므로 입장 허용
-    console.warn('Firebase 오류, 오프라인 모드:', e);
-    enterApp();
-  }
+  // Firebase에 기록 (비동기, 입장과 무관)
+  try{
+    const now = new Date();
+    const time = now.getFullYear()+'-'
+      +String(now.getMonth()+1).padStart(2,'0')+'-'
+      +String(now.getDate()).padStart(2,'0')+' '
+      +String(now.getHours()).padStart(2,'0')+':'
+      +String(now.getMinutes()).padStart(2,'0')+':'
+      +String(now.getSeconds()).padStart(2,'0');
+    const device = /iPad|iPhone|iPod/.test(navigator.userAgent)?'iPhone'
+                 : /Android/.test(navigator.userAgent)?'Android':'PC';
+    fetch(FB_URL+'/logs.json',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,time,device})
+    }).catch(()=>{});
+  }catch(e){}
 }
 </script>
 
