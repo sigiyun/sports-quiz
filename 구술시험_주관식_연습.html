@@ -85,6 +85,32 @@
 </head>
 <body>
 
+<!-- ░░ LOGIN SCREEN ░░ -->
+<div id="login-screen" style="position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#2D2870 0%,#534AB7 55%,#7F77DD 100%);display:flex;align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="background:#fff;border-radius:20px;padding:2rem 1.75rem;width:100%;max-width:360px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.25);">
+    <div style="font-size:48px;margin-bottom:.5rem">✏️</div>
+    <h2 style="font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:.25rem">구술시험 주관식 연습</h2>
+    <p style="font-size:13px;color:#6b6b8a;margin-bottom:1.5rem">인증된 수강생만 이용할 수 있습니다</p>
+    <div style="margin-bottom:12px;text-align:left">
+      <label style="font-size:12px;font-weight:500;color:#6b6b8a;display:block;margin-bottom:5px">이름</label>
+      <input id="login-name" type="text" placeholder="이름을 입력하세요"
+        style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+    </div>
+    <div style="margin-bottom:8px;text-align:left">
+      <label style="font-size:12px;font-weight:500;color:#6b6b8a;display:block;margin-bottom:5px">비밀번호</label>
+      <input id="login-pw" type="password" placeholder="비밀번호를 입력하세요"
+        style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+    </div>
+    <p id="login-err" style="font-size:12px;color:#A32D2D;min-height:18px;margin-bottom:10px;text-align:left"></p>
+    <button onclick="tryLogin()"
+      style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#534AB7,#7F77DD);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">
+      입장하기
+    </button>
+    <p style="font-size:11px;color:#a0a0b8;margin-top:1rem">비밀번호를 모르시면 담당 강사에게 문의하세요</p>
+  </div>
+</div>
+<div id="main-content" style="display:none">
+
 <div class="hero">
   <h1>✏️ 구술시험 주관식 연습</h1>
   <p>답변을 입력하면 핵심 키워드 포함 여부로 즉시 채점됩니다 · 완전 무료 · 94문제</p>
@@ -703,5 +729,82 @@ function showTab(id, el){
 
 renderPractice('all');
 </script>
+</div><!-- /main-content -->
+
+<script>
+// 로그인 input 이벤트
+document.addEventListener('DOMContentLoaded', function(){
+  var ni = document.getElementById('login-name');
+  var pi = document.getElementById('login-pw');
+  if(ni){
+    ni.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
+    ni.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
+    ni.addEventListener('keydown', function(e){ if(e.key==='Enter') pi.focus(); });
+  }
+  if(pi){
+    pi.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
+    pi.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
+    pi.addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
+  }
+});
+
+// ── 수강생 코드 ──────────────────────────
+const STUDENT_CODES = {
+  'kim-4493': '김진호',
+  'oh-4946':  '오혜진',
+  'yun-7007': '윤재원',
+  'jang-6656':'장미정',
+  'jang-6224':'장윤희',
+  'jang-7888':'장은정',
+  'jo-8925':  '조남석',
+  'jin-5569': '진광주',
+  'hong-2269':'홍승우',
+};
+const FB_URL = 'https://sports-quiz-60fae-default-rtdb.firebaseio.com';
+// ─────────────────────────────────────────
+
+function tryLogin(){
+  const name = document.getElementById('login-name').value.trim();
+  const pw   = document.getElementById('login-pw').value.trim();
+  const err  = document.getElementById('login-err');
+
+  if(!name){ err.textContent='이름을 입력해 주세요.'; return; }
+  if(!pw)  { err.textContent='비밀번호를 입력해 주세요.'; return; }
+
+  if(!STUDENT_CODES[pw]){
+    err.textContent='비밀번호가 올바르지 않습니다.';
+    document.getElementById('login-pw').value='';
+    return;
+  }
+
+  if(STUDENT_CODES[pw] !== name){
+    err.textContent='이름이 코드와 일치하지 않습니다.';
+    return;
+  }
+
+  err.textContent='';
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-content').style.display='block';
+
+  // Firebase 기록
+  try{
+    const now = new Date();
+    const time = now.getFullYear()+'-'
+      +String(now.getMonth()+1).padStart(2,'0')+'-'
+      +String(now.getDate()).padStart(2,'0')+' '
+      +String(now.getHours()).padStart(2,'0')+':'
+      +String(now.getMinutes()).padStart(2,'0')+':'
+      +String(now.getSeconds()).padStart(2,'0');
+    const device = /iPad|iPhone|iPod/.test(navigator.userAgent)?'iPhone'
+                 : /Android/.test(navigator.userAgent)?'Android':'PC';
+    fetch(FB_URL+'/logs.json',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,time,device,page:'주관식연습'})
+    }).catch(()=>{});
+  }catch(e){}
+}
+</script>
+
 </body>
 </html>
