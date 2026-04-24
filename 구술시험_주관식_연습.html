@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧗 구술시험 주관식 연습</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+  :root{
+    --purple:#534AB7;--purple-light:#EEEDFE;--purple-dark:#2D2870;
+    --teal:#1D9E75;--teal-light:#E1F5EE;
+    --amber:#BA7517;--amber-light:#FAEEDA;
+    --red:#A32D2D;--red-light:#FCEBEB;
+    --bg:#F8F7FF;--surface:#fff;--text:#1a1a2e;--text-sub:#6b6b8a;--border:#e8e6f0;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .hero{background:linear-gradient(135deg,var(--purple-dark),var(--purple) 60%,#7F77DD);padding:1.75rem 1.25rem;color:#fff;position:relative;overflow:hidden}
+  .hero::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05)}
+  .hero h1{font-size:19px;font-weight:700;margin-bottom:4px}
+  .hero p{font-size:12px;opacity:.75}
+  .tab-wrap{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(83,74,183,.06)}
+  .tabs{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 1rem}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{padding:.75rem 1rem;font-size:13px;font-weight:500;color:var(--text-sub);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;flex-shrink:0;transition:all .2s}
+  .tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+  .content{padding:1rem;max-width:680px;margin:0 auto;padding-bottom:5rem}
+  .section{display:none}.section.visible{display:block}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.25rem;margin-bottom:12px;box-shadow:0 2px 8px rgba(83,74,183,.06)}
+  .q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.25rem;margin-bottom:12px;box-shadow:0 2px 8px rgba(83,74,183,.06);transition:border-color .2s}
+  .q-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+  .q-num{font-size:11px;font-weight:700;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:6px;flex-shrink:0;margin-top:2px}
+  .q-text{font-size:14px;font-weight:500;color:var(--text);line-height:1.6;flex:1}
+  .badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;flex-shrink:0}
+  .b-c{background:var(--purple-light);color:#3C3489}.b-h{background:var(--teal-light);color:#085041}
+  .b-r{background:var(--amber-light);color:#633806}.b-s{background:var(--red-light);color:#791F1F}
+  .b-n{background:#E6F1FB;color:#0C447C}.b-g{background:#EAF3DE;color:#27500A}
+  textarea{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;font-family:'Noto Sans KR',sans-serif;resize:vertical;min-height:80px;outline:none;transition:border .2s;color:var(--text);background:var(--bg);line-height:1.6}
+  textarea:focus{border-color:var(--purple);background:var(--surface)}
+  .btn{padding:8px 16px;border-radius:8px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-p{background:var(--purple);color:#fff}.btn-p:hover{opacity:.88}
+  .btn-g{background:var(--purple-light);color:var(--purple);border:1px solid #AFA9EC}
+  .btn-sm{padding:6px 12px;font-size:12px}
+  .btn-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  /* 채점 결과 */
+  .result-box{margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+  .result-header{padding:10px 14px;display:flex;align-items:center;gap:8px}
+  .result-body{padding:12px 14px;font-size:13px;line-height:1.8}
+  .score-5{background:#E1F5EE;border-bottom:1px solid #9FE1CB}
+  .score-4{background:#EAF3DE;border-bottom:1px solid #C0DD97}
+  .score-3{background:var(--amber-light);border-bottom:1px solid #FAC775}
+  .score-2{background:var(--red-light);border-bottom:1px solid #F7C1C1}
+  .score-1{background:var(--red-light);border-bottom:1px solid #F7C1C1}
+  .stars{font-size:15px;letter-spacing:1px}
+  /* 키워드 태그 */
+  .kw-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .kw{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:500}
+  .kw-hit{background:var(--teal-light);color:#085041;border:1px solid #5DCAA5}
+  .kw-miss{background:var(--red-light);color:#791F1F;border:1px solid #F09595}
+  /* 진행 바 */
+  .prog-wrap{margin-bottom:1rem}
+  .prog-info{display:flex;justify-content:space-between;font-size:12px;color:var(--text-sub);margin-bottom:5px}
+  .prog-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),#7F77DD);border-radius:3px;transition:width .4s}
+  /* 필터 */
+  .filter-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:1rem}
+  .filter-scroll::-webkit-scrollbar{display:none}
+  .fbtn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:var(--surface);color:var(--text-sub);white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
+  .fbtn.on{background:var(--purple);color:#fff;border-color:var(--purple);font-weight:500}
+  /* 결과 */
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+  .stat{background:var(--bg);border-radius:10px;padding:.75rem;text-align:center;border:1px solid var(--border)}
+  .stat-n{font-size:22px;font-weight:700}.stat-l{font-size:11px;color:var(--text-sub);margin-top:2px}
+  .tip{font-size:11px;color:var(--text-sub);margin-top:5px}
+  .empty{text-align:center;padding:2rem;color:var(--text-sub);font-size:14px}
+  select{padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit}
+  .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+  .mode-card{padding:1rem;border-radius:var(--radius);border:1.5px solid var(--border);cursor:pointer;text-align:center;transition:all .15s;background:var(--surface)}
+  .mode-card.on{border-color:var(--purple);background:var(--purple-light)}
+  .mode-icon{font-size:26px;margin-bottom:4px}
+  .mode-title{font-size:13px;font-weight:600}
+  .mode-desc{font-size:11px;color:var(--text-sub);margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>✏️ 구술시험 주관식 연습</h1>
+  <p>답변을 입력하면 핵심 키워드 포함 여부로 즉시 채점됩니다 · 완전 무료 · 94문제</p>
+</div>
+
+<div class="tab-wrap">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('practice',this)">✏️ 주관식 연습</div>
+    <div class="tab" onclick="showTab('exam',this)">📝 모의고사</div>
+    <div class="tab" onclick="showTab('result',this)">📊 나의 결과</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- 주관식 연습 -->
+  <div id="practice" class="section visible">
+    <div class="filter-scroll">
+      <div class="fbtn on" onclick="filterQ(this,'all')">전체</div>
+      <div class="fbtn" onclick="filterQ(this,'climbing')">🧗 클라이밍</div>
+      <div class="fbtn" onclick="filterQ(this,'rule')">📋 경기규정</div>
+      <div class="fbtn" onclick="filterQ(this,'safety')">⛑️ 안전</div>
+      <div class="fbtn" onclick="filterQ(this,'hiking')">🏔️ 등산</div>
+      <div class="fbtn" onclick="filterQ(this,'nutrition')">🥗 영양</div>
+      <div class="fbtn" onclick="filterQ(this,'gear')">🔧 장비</div>
+    </div>
+    <div id="qcount" style="font-size:12px;color:var(--text-sub);margin-bottom:.75rem"></div>
+    <div id="practice-list"></div>
+  </div>
+
+  <!-- 모의고사 -->
+  <div id="exam" class="section">
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:1rem">⚙️ 모의고사 설정</div>
+      <div class="mode-grid">
+        <div class="mode-card on" onclick="setMode(this,'random')" id="mode-random">
+          <div class="mode-icon">🎲</div>
+          <div class="mode-title">랜덤 출제</div>
+          <div class="mode-desc">전체에서 랜덤</div>
+        </div>
+        <div class="mode-card" onclick="setMode(this,'weak')" id="mode-weak">
+          <div class="mode-icon">💪</div>
+          <div class="mode-title">취약 문제</div>
+          <div class="mode-desc">낮은 점수 위주</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:13px;color:var(--text-sub)">문제 수</span>
+        <select id="exam-count">
+          <option value="5">5문제</option>
+          <option value="10" selected>10문제</option>
+          <option value="15">15문제</option>
+          <option value="20">20문제</option>
+        </select>
+      </div>
+      <button class="btn btn-p" style="width:100%" onclick="startExam()">모의고사 시작 ▶</button>
+    </div>
+    <div id="exam-content"></div>
+  </div>
+
+  <!-- 나의 결과 -->
+  <div id="result" class="section">
+    <div id="result-content"><div class="empty">모의고사를 완료하면 결과가 표시됩니다</div></div>
+  </div>
+
+</div>
+
+<script>
+const CAT={climbing:'클라이밍',rule:'경기규정',safety:'안전·사고',hiking:'등산',nutrition:'영양',gear:'장비'};
+const BADGE={climbing:'b-c',rule:'b-r',safety:'b-s',hiking:'b-h',nutrition:'b-n',gear:'b-g'};
+
+// 문제 데이터 — 키워드: 필수(required) + 선택(optional)
+const QA=[
+  {cat:'climbing',q:'레스트스텝(Rest Step)의 정의와 효과를 설명하시오',
+   kw:{required:['무릎','펴','뼈','체중'],optional:['근육','피로','고지대','세컨드']},
+   a:'한 발을 내딛은 후 무릎을 완전히 펴고 뼈로 체중을 지지하며 순간 멈추는 보행 기술. 근육을 짧게 쉬게 해 피로 누적을 방지한다.'},
+  {cat:'climbing',q:'볼더링 성공(완등) 판정 기준을 설명하시오',
+   kw:{required:['두 손','TOP 홀드','안정'],optional:['완등','통제','꼭대기']},
+   a:'TOP 홀드를 두 손으로 잡고 안정적으로 통제한 자세를 취하거나, 볼더 꼭대기에 선 자세를 취하면 완등으로 인정된다.'},
+  {cat:'climbing',q:'자유등반과 인공등반의 차이를 설명하시오',
+   kw:{required:['장비','추락 방지','신체'],optional:['손잡이','발판','이동']},
+   a:'자유등반은 장비를 추락 방지 용도로만 사용하고 신체의 힘과 기술만으로 등반한다. 인공등반은 장비를 손잡이나 발판으로 활용하여 이동한다.'},
+  {cat:'climbing',q:'클라이밍 지도법 4단계를 설명하시오',
+   kw:{required:['설명','시범','실시','교정'],optional:['피드백','반복','지도자','학습자']},
+   a:'1단계 설명, 2단계 시범, 3단계 실시, 4단계 교정. 각 단계별로 동작을 설명하고 시연하며 학습자가 수행한 후 피드백을 준다.'},
+  {cat:'climbing',q:'홀드의 통제(Control)와 사용(Use)의 차이를 설명하시오',
+   kw:{required:['통제','사용','안정'],optional:['득점','이동','다음 홀드']},
+   a:'통제는 홀드를 잡아 안정적 자세를 취하거나 동적 움직임을 성공적으로 제동한 상태로 득점 인정 기준이다. 사용은 홀드를 잡고 다음 홀드 방향으로 실제 이동하는 것이다.'},
+  {cat:'climbing',q:'볼더링이 리드보다 부상이 많은 이유를 설명하시오',
+   kw:{required:['로프','안전매트','추락'],optional:['근력','동적','관절','볼더링']},
+   a:'볼더링은 로프 없이 안전매트에 직접 추락하기 때문에 부상이 많다. 반복적인 고강도 동작으로 근육·관절에 집중적인 스트레스가 가해진다.'},
+  {cat:'climbing',q:'기저면(Base of Support)이란 무엇인지 설명하시오',
+   kw:{required:['손','발','홀드','면적'],optional:['무게중심','안정','기저']},
+   a:'등반자가 벽에 접촉하는 손·발 홀드들이 이루는 지지 면적. 기저면이 넓을수록 안정적이며 무게중심을 기저면 위에 유지해야 효율적이다.'},
+  {cat:'rule',q:'FOP(Field of Play)란 무엇인지 설명하시오',
+   kw:{required:['경기 구역','격리','대기'],optional:['출입','임원','심판','선수']},
+   a:'경기가 진행되는 공식 경기 구역 전체. 격리구역, 대기구역, 이동구역, 준비운동지역이 포함된다. 출입 가능자는 KAF 임원, 조직위원회 임원, 출전 선수, 심판 등이다.'},
+  {cat:'rule',q:'볼더링·리드·스피드 경기의 순위 결정 방법을 설명하시오',
+   kw:{required:['완등','시도 횟수','높이','시간'],optional:['존','스피드','콤바인','곱']},
+   a:'볼더링은 완등 수, 시도 횟수 순. 리드는 가장 높이 올라간 홀드 기준, 동점 시 시간. 스피드는 완등 소요 시간. 콤바인은 각 종목 순위의 곱.'},
+  {cat:'rule',q:'불법적인 도움(Illegal Assistance)을 설명하시오',
+   kw:{required:['T-너트','테이프','로프'],optional:['볼트','행거','정보','조언']},
+   a:'T-너트를 손으로 사용하거나, 검정색 테이프 경계선 바깥 표면 사용, 고정 볼트 행거를 손발로 사용, 확보지점이나 로프를 손발로 사용, 외부로부터 정보나 조언을 받는 행위.'},
+  {cat:'rule',q:'격리(Isolation) 상태와 격리구역을 설명하시오',
+   kw:{required:['정보','격리구역','제한'],optional:['입장','선수','공유','라운드']},
+   a:'격리 상태는 선수가 해당 라운드에 대해 제한적인 정보만으로 경기하게 하는 것이다. 격리구역은 출전 자격 있는 선수와 공인된 팀 임원만 입장 가능하다.'},
+  {cat:'rule',q:'레드카드와 옐로우카드의 기준을 설명하시오',
+   kw:{required:['옐로우','레드','실격'],optional:['비스포츠','장비','BMI','두 장']},
+   a:'옐로우카드는 사소한 비스포츠 행동, 장비 규정 불이행 등. 레드카드는 비승인 장비 사용, 외부 정보 공유, BMI 거부, 동일 대회 옐로우 2장 시 부여되며 대회 전체 실격이다.'},
+  {cat:'rule',q:'DNS(출발않음)의 의미를 설명하시오',
+   kw:{required:['시도','격리구역','호명'],optional:['출발','라운드','볼더','기권']},
+   a:'대회 라운드에서 특정 볼더 또는 루트를 선수가 시도하지 않은 것. 격리구역에 미입장하거나 대기구역에서 호명 시 응답이 없는 경우 해당된다.'},
+  {cat:'safety',q:'일사병과 열사병의 차이와 응급처치를 설명하시오',
+   kw:{required:['체온','의식','119'],optional:['발한','40도','체온조절','장기']},
+   a:'일사병은 체온 37~40도, 의식 있음, 수분 보충으로 회복 가능. 열사병은 체온조절 마비, 40도 이상, 의식 혼미, 즉시 119 신고 필요. 열사병이 더 위험한 이유는 자연 회복 불가능하기 때문이다.'},
+  {cat:'safety',q:'CPR(심폐소생술)의 순서를 설명하시오',
+   kw:{required:['가슴 압박','119','기도'],optional:['인공호흡','30:2','100회','AED']},
+   a:'반응 확인 후 119 신고, AED 요청. 가슴 압박(흉골 아래 1/2, 분당 100~120회, 5~6cm 깊이). 기도 열기. 인공호흡 2회. 30:2 비율로 반복.'},
+  {cat:'safety',q:'저체온증의 원인, 증상, 예방법을 설명하시오',
+   kw:{required:['35도','체온','오한'],optional:['젖은 옷','바람','의식','보온']},
+   a:'체온 35도 이하 상태. 젖은 옷과 바람에 노출 시 열 손실 급증. 증상은 오한→판단력 저하→근육 경직→의식 혼미 순. 예방은 방풍 보온 의류, 고열량 음식 수시 섭취.'},
+  {cat:'safety',q:'볼더링 안전 수칙을 설명하시오',
+   kw:{required:['확인','추락','매트'],optional:['뛰어내리','엉덩이','간섭','착석']},
+   a:'등반 전 상하좌우 확인, 주위 사람 간섭 여부 확인. 뛰어내리지 않기. 추락 시 엉덩이·등으로 충격 분산. 등반 벽 아래 착석 금지.'},
+  {cat:'hiking',q:'사점(Dead Point)이란 무엇이며 어떻게 극복하는지 설명하시오',
+   kw:{required:['심폐','한계','호흡'],optional:['맥박','세컨드 윈드','레스트스텝','속도']},
+   a:'심폐기능이 한계점에 도달해 맥박이 최대로 올라가고 호흡이 어렵고 어지러움을 느끼는 구간. 속도 줄이기, 복식 호흡, 레스트스텝으로 세컨드 윈드 단계를 만든다.'},
+  {cat:'hiking',q:'조난 예방 방법과 대처 방안을 설명하시오',
+   kw:{required:['기상','119','체온'],optional:['계획서','GPS','호루라기','구조']},
+   a:'예방: 기상 확인, 산행 계획서 작성, GPS 휴대, 충분한 식수·비상식. 대처: 현 위치 파악 → 119 신고 → 체온 유지 → 체력 보존하며 구조 대기.'},
+  {cat:'hiking',q:'배낭의 종류와 힙벨트의 역할을 설명하시오',
+   kw:{required:['힙벨트','어깨','하중'],optional:['데이팩','내부프레임','70%','분산']},
+   a:'데이팩(당일), 중형(1~2박), 대형(원정) 등으로 구분. 힙벨트는 배낭 무게의 70~80%를 어깨에서 엉덩이·다리로 분산하여 어깨 피로를 줄인다.'},
+  {cat:'hiking',q:'레스트스텝(Rest Step)의 사용 이유와 목적을 설명하시오',
+   kw:{required:['무릎','근육','피로'],optional:['뼈','체중','레스트스텝','사점']},
+   a:'한 발 내딛은 후 무릎을 펴고 뼈로 체중을 지지해 근육을 짧게 쉬게 하는 기술. 장거리 산행에서 피로 누적을 방지하고 사점 극복에 효과적이다.'},
+  {cat:'nutrition',q:'6대 영양소와 등산 시 에너지 소비 순서를 설명하시오',
+   kw:{required:['탄수화물','지방','단백질'],optional:['비타민','무기질','물','순서']},
+   a:'6대 영양소는 탄수화물, 단백질, 지방, 비타민, 무기질, 물. 에너지 소비 순서는 탄수화물 → 지방 → 단백질 순이다.'},
+  {cat:'nutrition',q:'행동식과 비상식의 차이 및 종류를 설명하시오',
+   kw:{required:['행동식','비상식','고열량'],optional:['이동','조리','에너지바','조난']},
+   a:'행동식은 이동 중 간편 섭취 가능한 고열량 식품(에너지바, 견과류 등). 비상식은 조난 등 긴급 상황에만 사용하는 고열량 장기 보관 식품.'},
+  {cat:'nutrition',q:'무기질(미네랄) 부족 시 증상을 설명하시오',
+   kw:{required:['칼슘','철분','나트륨'],optional:['골다공증','빈혈','경련','마그네슘']},
+   a:'칼슘 부족: 골다공증, 경련. 철분 부족: 빈혈, 피로. 칼륨 부족: 근육 약화, 부정맥. 나트륨 부족: 두통, 혼란. 마그네슘 부족: 근육 경련, 만성 피로.'},
+  {cat:'nutrition',q:'등산에서 단당류가 유익한 이유를 설명하시오',
+   kw:{required:['흡수','에너지','혈당'],optional:['포도당','빠르','즉각','소화']},
+   a:'소화 없이 체내에 빠르게 흡수되어 즉각적인 에너지를 공급한다. 등산 중 에너지 고갈 시 신속한 혈당 회복에 효과적이다.'},
+  {cat:'gear',q:'카라비너의 종류를 잠금 방식과 형태별로 설명하시오',
+   kw:{required:['스크류락','D형','HMS'],optional:['오토락','논락','오벌','20kN']},
+   a:'잠금 방식: 스크류락, 오토락, 논락. 형태: 오벌(좌우대칭), D형(비대칭, 강도 높음), HMS형(확보·하강용). UIAA 기준 세로 20kN 이상.'},
+  {cat:'gear',q:'로프 폐기 결정 기준을 설명하시오',
+   kw:{required:['추락','손상','화학물질'],optional:['1년','2년','충격','폐기']},
+   a:'심한 추락 후, 외피 손상(절단·마모), 열·화학물질 노출 시 폐기. 수명 기준: 매일 사용 1년, 주말 사용 2년, 가끔 사용 4년, 아주 큰 충격 후 즉시 폐기.'},
+  {cat:'gear',q:'안전벨트(하네스)의 역할과 종류를 설명하시오',
+   kw:{required:['추락','충격','시트 하네스'],optional:['체스트','전신','허리','허벅지']},
+   a:'추락 시 무게 중심을 잡아주고 충격을 분산. 종류: 시트 하네스(가장 일반적), 체스트 하네스(시트와 병용), 전신 하네스(어린이·특수상황).'},
+  {cat:'gear',q:'확보물의 종류와 설치 원칙을 설명하시오',
+   kw:{required:['자연','인공','2개'],optional:['너트','캠','볼트','균등']},
+   a:'자연 확보물(나무, 바위 구멍 등)과 인공 확보물(하켄, 너트, 캠, 볼트)로 구분. 항상 2~3개 이상 균등연결법으로 설치해야 한다.'},
+  {cat:'gear',q:'8자 매듭(Figure-8 Knot)의 특징과 주의사항을 설명하시오',
+   kw:{required:['8자','안전','옭매듭'],optional:['강도','시각','5cm','되감기']},
+   a:'가장 강하고 시각적으로 확인이 쉬운 매듭. 되감기 8자 매듭으로 안전벨트에 직접 연결. 반드시 옭매듭으로 마무리하고 로프 끝을 5cm 이상 남겨야 한다.'},
+
+  // ── 경기규정 추가 ──
+  {cat:'rule',q:'스피드 경기에 대해 설명하시오',
+   kw:{required:['15m','95도','시간'],optional:['완등패드','톱로핑','오토빌레이','인공벽']},
+   a:'높이 15m, 기울기 95도의 인공벽을 누가 더 빠르게 완등패드를 터치하는지 겨루는 경기. IFSC 승인 자동계측시스템과 오토빌레이 시스템을 사용한 톱로핑 방식으로 진행한다.'},
+  {cat:'rule',q:'리드 경기에 대해 설명하시오',
+   kw:{required:['높이','퀵드로우','클립'],optional:['15m','로프','안전벨트','순서대로']},
+   a:'누가 더 높은 곳까지 올라갈 수 있는지 겨루는 경기. 안전벨트에 로프를 묶고 최소 길이 15m 인공벽의 퀵드로우에 순서대로 클립하며 올라가는 방식이다.'},
+  {cat:'rule',q:'볼더링 종목에 대해 설명하시오',
+   kw:{required:['로프','4~5m','완등'],optional:['볼더','문제','시도횟수','보조장비']},
+   a:'볼더(큰 바위)라는 4~5m의 낮은 벽을 로프나 보조장비 없이 팔과 다리로만 오르는 종목. 완등한 루트의 수와 시도횟수에 따라 우승자가 결정된다.'},
+  {cat:'rule',q:'스피드 경기 개최 충족 요건을 설명하시오',
+   kw:{required:['IFSC','자동계측','오토빌레이'],optional:['대산련','인증','톱로핑','빌레이어']},
+   a:'IFSC 스피드 라이센스 규정에 따라 설계된 인공구조물에서 개최. IFSC 또는 대산련 승인 전자계측시스템 사용. IFSC 또는 대산련 승인 오토빌레이 시스템으로 톱로핑 방식 진행. 예외적으로 두 명의 빌레이어 톱로핑 승인 가능.'},
+  {cat:'rule',q:'국내 스피드 공식기록이 인정되는 경우를 설명하시오',
+   kw:{required:['대산련','경기','반도핑'],optional:['인증','계측시스템','심판위원장','기록경기']},
+   a:'경기 중 만들어진 기록만 인정. IFSC 및 대산련 인증 등반벽·계측시스템·오토빌레이 시스템 사용. 대산련이 기록경기로 지정한 경우. 대산련 임명 심판위원장이 조직·운영. 대회 조직위가 반도핑 검사 완료 후 대산련에 보고한 경우.'},
+  {cat:'rule',q:'2024년 파리올림픽 경기방식을 설명하시오',
+   kw:{required:['볼더','리드','스피드'],optional:['콤바인','포인트','올림픽','종합순위']},
+   a:'볼더+리드 콤바인 경기와 스피드 경기로 분리 진행. 선수들은 볼더와 리드 경기에 각각 출전해 포인트를 획득하고, 두 경기를 치른 뒤 종합순위가 가장 높은 선수가 올림픽 챔피언이 된다.'},
+  {cat:'rule',q:'볼더링 경기 이의제기 시기에 대해 설명하시오',
+   kw:{required:['예선','결승','5분'],optional:['공식결과','발표','즉시','이의신청']},
+   a:'예선 라운드 관련 이의신청은 공식결과 발표 후 5분 이내. 결승 라운드 관련 이의신청은 관련 결과·순위 발표 후 즉시 해야 한다.'},
+  {cat:'rule',q:'볼더링 경기 홀드 청소 방법을 설명하시오',
+   kw:{required:['솔','청소','바닥'],optional:['조직위','도구','홀드','요청']},
+   a:'대회 조직위가 제공하는 솔과 기타 도구만 청소 목적으로 사용 가능. 어떤 홀드도 사용하지 않고 바닥에서 닿는 볼더의 부분만 청소할 수 있다. 볼더 청소를 요청할 수도 있다.'},
+  {cat:'rule',q:'리드 경기 준결승·결승 관찰시간 동안 허용사항을 설명하시오',
+   kw:{required:['망원경','첫 번째 홀드','6분'],optional:['그림','기록','수기','트랜짓존']},
+   a:'6분의 단체 관찰시간 제공. 지면을 떠나지 않은 채 첫 번째 홀드만 만질 수 있다. 망원경 사용 가능. 수기로 그림을 그리거나 기록 가능. 그 외 기록장비 사용 금지. 관찰 후 격리구역이나 이동구역으로 이동.'},
+  {cat:'rule',q:'리드 경기 동률인 경우 순위 결정 방식을 설명하시오',
+   kw:{required:['카운트백','시간'],optional:['동률','등반시간','높이','동순위']},
+   a:'카운트백을 적용하여 관련 선수들의 순위를 결정한다. 동률 시 등반 시간에 의해 결정된다.'},
+  {cat:'rule',q:'리드 경기 중 심판이 종료를 선언하는 경우를 설명하시오',
+   kw:{required:['위험','시간초과','지면'],optional:['기술적사고','정당한위치','종료','불법']},
+   a:'선수가 더 이상 진행하는 것이 위험하다고 판단될 때. 등반허용시간 초과. 등반 시작 후 신체가 지면과 접촉한 경우. 정당한 위치에 있지 않은 경우. 기술적 사고 발생 시.'},
+  {cat:'rule',q:'볼더링 경기 루트 설계 방식을 설명하시오',
+   kw:{required:['12개','존홀드','TOP홀드'],optional:['4~8개','출발홀드','색상','하향점프']},
+   a:'한 볼더에서 최대 손 홀드 12개, 한 라운드 평균 4~8개. 출발 홀드와 완등 홀드는 같은 색상으로 표시. 존 홀드는 다른 색으로 표시. 하향 점프 없을 것. 추락으로 인한 부상·방해 가능성 없을 것.'},
+  {cat:'rule',q:'볼더링 경기 루트 관찰 규정을 설명하시오',
+   kw:{required:['결승','2분','출발홀드'],optional:['예선','준결승','기록장비','트랜짓존']},
+   a:'예선·준결승: 별도 관찰시간 없음, 입장 전 15초 준비시간. 결승: 볼더당 2분 관찰시간. 관찰 시간 동안 출발 홀드만 만질 수 있고 기록장비 사용 금지. 두 발이 바닥을 떠나지 않은 채.'},
+  {cat:'rule',q:'볼더링 경기 등반시도와 종료에 관한 규정을 설명하시오',
+   kw:{required:['지면','완등','추락'],optional:['신체','모든부위','심판','기술적사고']},
+   a:'시작: 선수 신체의 모든 부분이 지면에서 떠났을 때. 종료: 완등한 경우, 추락하거나 출발 이후 바닥에 접촉한 경우, 심판에 의해 실패 선언을 받거나 기술적 사고 발생 시.'},
+  {cat:'rule',q:'스포츠클라이밍 장비 사용 기준을 설명하시오',
+   kw:{required:['UIAA','CE','인증'],optional:['PPE','로프','카라비너','하네스']},
+   a:'반드시 UIAA 안전기준이나 CE의 PPE 안전기준에 적합한 장비를 사용해야 한다. 모든 장비는 반드시 UIAA 또는 CE 라벨이 있어야 한다. 용도에 맞는 장비만 사용한다.'},
+  {cat:'rule',q:'킬로그램(kg)과 뉴턴(N)의 차이를 설명하시오',
+   kw:{required:['질량','힘','9.8'],optional:['kN','UIAA','중력','단위']},
+   a:'kg은 질량 단위(물체의 고유한 양). N(뉴턴)은 힘 단위(F=ma). 지구에서 1kg ≈ 9.8N(중력가속도 적용). UIAA 장비 강도 기준은 kN(킬로뉴턴)으로 표시한다.'},
+  {cat:'rule',q:'볼더링 기술적 사고 시 비디오 판정으로 영상에 나와야 하는 것들을 설명하시오',
+   kw:{required:['홀드','발','통제'],optional:['영상','위치','사용','판정']},
+   a:'홀드의 사용 여부, 발의 위치, 홀드 통제 여부가 영상에 나와야 비디오 판정이 가능하다. 이러한 내용이 영상에 없으면 판정 불가.'},
+  {cat:'rule',q:'강사가 통일된 용어를 사용해야 하는 이유를 설명하시오',
+   kw:{required:['소통','안전','혼란'],optional:['구호','즉각','체계','용어']},
+   a:'학습자가 혼란 없이 동작·기술을 정확히 이해할 수 있도록 하기 위해서. 안전 상황에서 구호(출발·완료·추락 등)의 즉각적 소통 보장. 체계적 교육 진행 및 반복 학습 효과 증대.'},
+  {cat:'rule',q:'리드클라이밍의 정당한 위치에 대해 설명하시오',
+   kw:{required:['로프','확보지점','클립'],optional:['Z클립','순서대로','마지막','통과']},
+   a:'확보지점에 순서대로 로프를 클립한 상태. 루트 상단 앵커에 로프가 통과된 경우는 TOP홀드를 통제했을 때. Z클립이 발생했다면 수정 후 모든 확보지점이 순차적으로 클립되어 있어야 한다.'},
+
+  // ── 클라이밍 추가 ──
+  {cat:'climbing',q:'스포츠 클라이밍이란 무엇인지 설명하시오',
+   kw:{required:['인공벽','안전','위험'],optional:['스포츠','클라이밍','경기','규칙']},
+   a:'클라이밍의 위험성을 최대한 제거하고 미리 정비된 암벽이나 클라이밍을 위해 만들어진 인공벽을 등반하는 것. 필수 규칙 안에서 클라이밍 기량을 겨루는 스포츠이다.'},
+  {cat:'climbing',q:'스포츠 클라이밍과 등산의 가장 큰 차이점을 설명하시오',
+   kw:{required:['인공벽','안전','경기'],optional:['자연','위험','규칙','기량']},
+   a:'등산은 자연 지형에서 진행되며 날씨·지형 등 자연 위험 요소가 있다. 스포츠 클라이밍은 인공벽에서 안전을 보장한 상태로 진행되며 경기 규칙에 따라 기량을 겨루는 스포츠이다.'},
+  {cat:'climbing',q:'클라이밍에서 기술적 사고(Technical Incident)란 무엇인지 설명하시오',
+   kw:{required:['선수','외부','방해'],optional:['홀드','파손','추가시도','심판']},
+   a:'선수의 과실이 아닌 외부 원인으로 등반이 방해받는 것. 홀드 파손, 매트 위치 이상 등이 해당된다. 심판위원장이 판단하여 추가 시도를 부여할 수 있다.'},
+  {cat:'climbing',q:'클라이밍 대회에서 공식 영상만을 사용하는 이유를 설명하시오',
+   kw:{required:['공정','일관','판정'],optional:['영상','비디오','홀드','통제']},
+   a:'모든 선수에게 공정하고 일관된 판정 기준을 적용하기 위해서. 홀드 통제 여부, 발 위치 등 판정에 필요한 정보를 정확하게 확인할 수 있어야 하기 때문이다.'},
+  {cat:'climbing',q:'트래드 클라이밍에서 스포츠 클라이밍으로 발전하게 된 결정적 계기를 설명하시오',
+   kw:{required:['인공벽','안전','볼트'],optional:['위험','반복','훈련','대중화']},
+   a:'자연 암벽의 위험성을 제거하기 위해 인공벽과 미리 설치된 볼트가 도입되면서 안전하게 반복 훈련이 가능해졌다. 이를 통해 등반 기술이 발전하고 대중화되었다.'},
+  {cat:'climbing',q:'드꿰르뱅(de Quervain) 건초염에 대해 설명하시오',
+   kw:{required:['엄지','손목','힘줄'],optional:['건초','염증','핀치','통증']},
+   a:'엄지손가락 쪽 손목 힘줄(단무지신근·장무지외전근)의 건초 염증. 핀치그립·횡단 자세 등 엄지를 강하게 사용하는 동작이 원인. 증상은 손목 엄지 쪽 통증과 부기.'},
+  {cat:'climbing',q:'트램펄린 골절에 대해 설명하시오',
+   kw:{required:['골절','착지','볼더링'],optional:['매트','충격','발목','X-ray']},
+   a:'볼더링 착지 충격 시 뼈가 어긋나지 않고 금이 가는 형태의 골절. 매트가 있어도 예측 불가 자세 착지로 발목·무릎·발꿈치에 발생. 초기 통증이 심하지 않아 X-ray 확인 필요.'},
+  {cat:'climbing',q:'빌레이 간섭현상을 피하기 위해 이동하는 방법을 설명하시오',
+   kw:{required:['대각선','볼트','방향'],optional:['빌레이어','간섭','로프','위치']},
+   a:'등반자가 첫 번째 볼트를 통과하면 등반 방향과 반대 대각선에 자리한다. 7m 이후(4번째 클립)에는 조금 떨어져 로프를 약간 느슨하게 하여 클립하기 편하도록 위치한다.'},
+  {cat:'climbing',q:'기초 클라이밍 지도에서 사용하는 손과 사용하지 않는 손을 설명하시오',
+   kw:{required:['사용하는 손','사용하지 않는 손','지지'],optional:['이동','다음 홀드','균형','분리']},
+   a:'사용하는 손은 다음 홀드로 이동하거나 동작을 수행하는 활동적인 손. 사용하지 않는 손은 몸을 지탱·고정하는 지지 역할의 손. 초보자 지도 시 두 손의 역할 분리를 명확히 인지시켜야 균형 있는 등반이 가능하다.'},
+  {cat:'climbing',q:'아웃사이드 클라이밍(야외 클라이밍)의 특징을 설명하시오',
+   kw:{required:['자연','날씨','위험'],optional:['암벽','홀드','낙석','준비']},
+   a:'자연 암벽에서 진행되며 날씨·낙석·홀드 마모 등 자연적 위험 요소가 존재한다. 충분한 사전 준비와 장비 점검이 필수이며, 실내와 달리 홀드 상태를 미리 파악해야 한다.'},
+  {cat:'climbing',q:'클라이밍 상해에서 손가락 A2·A4 활차 파열이 많은 이유를 설명하시오',
+   kw:{required:['A2','A4','혈관'],optional:['활차','크림프','파열','회복']},
+   a:'손가락 A2·A4 활차는 힘줄을 고정하는 조직으로 클라이밍 시 집중적인 하중이 걸린다. 특히 크림프 그립 사용 시 과부하가 걸려 파열되기 쉽다. 혈관이 없어 회복이 매우 느리다.'},
+  {cat:'climbing',q:'내적 손상(상해)을 입히지 않기 위해 어떻게 지도해야 하는지 설명하시오',
+   kw:{required:['워밍업','점진적','강도'],optional:['스트레칭','피드백','자세','오버트레이닝']},
+   a:'충분한 워밍업·스트레칭 실시. 개인 수준에 맞는 점진적 강도 조절. 정확한 자세·기술 반복 지도. 충분한 휴식 강조(오버트레이닝 방지). 신체 통증 신호 시 즉시 중단 지도.'},
+  {cat:'climbing',q:'무반응 착지의 원인에 대해 설명하시오',
+   kw:{required:['근육','긴장','착지'],optional:['볼더링','충격','피로','반응']},
+   a:'근육이 과도하게 피로하거나 긴장이 풀린 상태에서 예기치 못한 추락 시 발생. 착지 순간 근육이 충격에 반응하지 못하여 관절에 직접 하중이 전달된다. 볼더링에서 주로 발생한다.'},
+  {cat:'climbing',q:'클라이밍 근육 피로의 원인을 설명하시오',
+   kw:{required:['젖산','ATP','근섬유'],optional:['무산소','에너지','신경','미세손상']},
+   a:'젖산 축적(무산소 운동 시 발생, 수축력 저하). ATP 고갈(근육 에너지원 소진). 신경 피로(뇌-근육 신경 전달 효율 저하). 근섬유 미세 손상(고강도 동작으로 발생).'},
+
+  // ── 등산 추가 ──
+  {cat:'hiking',q:'등산지도와 스포츠클라이밍 지도의 차이점을 설명하시오',
+   kw:{required:['자연','인공벽','지형'],optional:['등산지도사','클라이밍지도사','장비','평가']},
+   a:'등산 지도는 산악 전반(트레킹·등산·겨울산행 등) 자연 지형 활동 중심. 스포츠 클라이밍 지도는 인공 암벽·볼더링 전문 지도. 장비·안전 기준·지도 방법·평가 영역이 다르다.'},
+  {cat:'hiking',q:'등산교육에서 행동주의·인지주의·구성주의를 설명하시오',
+   kw:{required:['행동주의','인지주의','구성주의'],optional:['반복','이해','경험','학습자']},
+   a:'행동주의: 자극-반응 기반, 반복 훈련과 강화로 행동 변화, 교사 중심. 인지주의: 이해·기억·사고를 통한 학습 강조, 정보를 의미 있는 구조로 조직화. 구성주의: 학습자가 경험으로 스스로 지식을 구성, 학습자 중심.'},
+  {cat:'hiking',q:'등산 후 정리(마무리)에 대해 설명하시오',
+   kw:{required:['스트레칭','수분','장비'],optional:['근육','이완','점검','발']},
+   a:'스트레칭으로 사용한 근육 이완. 영양·수분 보충(단백질로 근육 회복 촉진). 장비 점검·세척·건조 보관. 발 상태 확인(물집·부상). 심리적 성찰: 안전했던 점·개선할 점 검토.'},
+  {cat:'hiking',q:'비박(Bivouac) 시 가장 먼저 해야 할 행동을 설명하시오',
+   kw:{required:['장소','체온','안전'],optional:['낙석','바람','침낭','저체온증']},
+   a:'① 안전한 장소 확보: 낙석·눈사태·침수·바람 없는 평평한 곳. ② 체온 유지: 젖은 옷 교체, 침낭·비상 담요 활용(저체온증이 최대 위험). 이후: 119 신고, shelter 구축, 식량·수분 확인.'},
+  {cat:'hiking',q:'산행 중 휴식과 회복에 대해 설명하시오',
+   kw:{required:['피로','수분','근육'],optional:['30분','10분','혈액순환','에너지']},
+   a:'피로감 느끼기 전에 미리 휴식(30~40분 이동 후 10분 휴식). 짧은 휴식: 배낭 벗지 않고 다리 펴기. 본격 휴식: 수분·에너지 보충, 근육 이완. 장시간 멈춤 피하기(체온 하락, 근육 굳음).'},
+  {cat:'hiking',q:'에너지 절약 보행 방법과 배낭 패킹에 대해 설명하시오',
+   kw:{required:['보행','배낭','무게'],optional:['레스트스텝','뼈','패킹','등쪽']},
+   a:'보행: 레스트스텝으로 뼈에 무게를 실어 근육 피로 감소. 발바닥 전체로 걷기. 호흡 조절. 배낭 패킹: 부피 크고 가벼운 짐은 하단, 무거운 짐은 중간 등쪽, 자주 쓰는 물품은 헤드에 넣기.'},
+  {cat:'hiking',q:'즐거운 산행을 하기 위한 방법을 설명하시오',
+   kw:{required:['체력','안전','준비'],optional:['난이도','기상','8시간','계획']},
+   a:'자신의 등반 수준에 맞는 난이도 선택. 철저한 사전 준비(날씨 확인, 장비·옷·식량). 산행은 8시간 이내, 체력의 1/3 비축. 아침 일찍 시작, 해지기 1시간 전 마치기. 안전하게 귀가하는 것이 목표.'},
+  {cat:'hiking',q:'위험 요인 인지 4단계를 설명하시오',
+   kw:{required:['인지','평가','결정','행동'],optional:['위험','가능성','회피','실행']},
+   a:'1단계 위험 인지: 잠재적 위험 요소 인식. 2단계 위험 평가: 발생 가능성·심각도 판단. 3단계 의사 결정: 대처 방법 선택(회피·감소·수용). 4단계 행동: 결정한 대처 방법 실행.'},
+  {cat:'hiking',q:'산행에 있어 선행학습의 장점을 설명하시오',
+   kw:{required:['안전','코스','준비'],optional:['날씨','난이도','시간','자신감']},
+   a:'안전성 확보: 코스 난이도·위험 구간·소요 시간 사전 파악. 체력·준비물 조절. 예측 불가 상황 대비. 날씨·난이도에 맞는 장비 준비. 자신감 향상, 시간·비용 절약.'},
+  {cat:'hiking',q:'워킹용 스틱 사용 목적과 방법을 설명하시오',
+   kw:{required:['균형','무릎','하중'],optional:['오르막','내리막','길이','손목']},
+   a:'목적: 균형 유지, 무릎·관절 충격 완화, 체력 소모 감소. 손목걸이는 아래에서 위로 끼운 다음 손바닥으로 누르듯 잡기. 오르막: 스틱 짧게, 내리막: 스틱 길게. 스틱 진행 방향은 발보다 앞으로 나가지 않게.'},
+  {cat:'hiking',q:'FOP에 반입할 수 없는 물건을 설명하시오',
+   kw:{required:['코칭','통신기기','승인'],optional:['허가되지않은','장비','정보','경기지역']},
+   a:'허가되지 않은 통신기기, 코칭 보드, 승인되지 않은 장비, 정보 전달 목적의 물품은 반입 불가. 경기지역에서는 오직 권한이 있는 사람만 승인된 장비만 사용할 수 있다.'},
+
+  // ── 안전 추가 ──
+  {cat:'safety',q:'등산 시 열질환 예방법을 설명하시오',
+   kw:{required:['수분','의류','자외선'],optional:['전해질','모자','그늘','시간대']},
+   a:'충분한 수분 섭취(출발 전·중·후). 통풍 잘 되는 흡습속건 의류 착용. 자외선 차단제 사용, 모자 착용. 무더운 시간대(오전 10시~오후 3시) 격렬한 산행 자제. 그늘에서 휴식, 전해질 보충.'},
+  {cat:'safety',q:'낙뢰(벼락) 사고 예방법을 설명하시오',
+   kw:{required:['능선','금속','낮은'],optional:['피켈','동굴','나무','적란운']},
+   a:'적란운 발달 시 즉시 하산. 정상·능선·고립된 나무 등 높은 곳 피하기. 금속 장비(피켈·카라비너) 몸에서 분리. 낮은 자세로 대피. 동굴 입구·절벽 아래도 위험(접지 전류).'},
+  {cat:'safety',q:'동상의 원인, 증상, 응급처치를 설명하시오',
+   kw:{required:['체온','혈액순환','따뜻한물'],optional:['말단','창백','물집','마찰금지']},
+   a:'원인: 극한 추위로 혈액순환 저하, 손·발·귀·코 등 말단 부위에 발생. 증상: 피부 창백·감각 소실→붉게 변함→물집→괴사. 응급처치: 따뜻한 곳으로 이동, 37~39°C 따뜻한 물에 담가 천천히 해동(마찰·문지르기 금지).'},
+  {cat:'safety',q:'눈사태의 종류와 예방법을 설명하시오',
+   kw:{required:['건설','습설','사면'],optional:['속도','비콘','삽','탐침봉']},
+   a:'건설(乾雪) 눈사태: 가루눈, 고속. 습설(濕雪) 눈사태: 젖은 눈, 저속·파괴력 큼. 예방: 눈사태 취약 시간대(정오~오후, 기온↑) 위험 사면 자제. 비콘·삽·탐침봉 휴대. 사면 가로지르지 않고 능선 이용.'},
+  {cat:'safety',q:'클라이밍 안전 수칙(리드 등반)을 설명하시오',
+   kw:{required:['크로스체크','퀵드로우','순서대로'],optional:['게이트','장갑','하강','초속']},
+   a:'반드시 2명 이상 팀 구성. 크로스체크: 안전벨트·매듭·디바이스 상호 확인. 퀵드로우 게이트는 등반 반대 방향으로 설치. 로프는 아래부터 순서대로 클립, 건너뛰기 금지. 하강 속도 초속 3m 이내, 장갑 착용 권장.'},
+  {cat:'safety',q:'운동 중 수분이 부족할 때의 위험을 설명하시오',
+   kw:{required:['2%','4%','20%'],optional:['갈증','근육','의식','사망']},
+   a:'체수분 2% 손실: 갈증·식욕 부진. 4% 손실: 근육 이상·신체 활동 부진. 8% 손실: 현기증·정신 장애. 20% 손실: 사망 위험. 갈증을 느끼기 전에 미리 수시로 수분 보충 필수.'},
+
+  // ── 영양 추가 ──
+  {cat:'nutrition',q:'등산에 필요한 영양과 에너지 보충 방법을 설명하시오',
+   kw:{required:['탄수화물','2시간','수분'],optional:['에너지바','견과류','지방','단백질']},
+   a:'탄수화물은 등반 2시간마다 섭취. 물은 수시로 마셔 탈수 예방. 비상식: 에너지 빠른 공급 가능한 말린 과일·견과류·초콜릿. 행동식: 걸어가면서 섭취 가능한 간편 식품. 등반 시간 길어질수록 지방 에너지 사용 비율 증가.'},
+  {cat:'nutrition',q:'비상식이 중요한 이유와 종류를 설명하시오',
+   kw:{required:['조난','긴급','고열량'],optional:['장기보관','에너지','초콜릿','젤리']},
+   a:'조난이나 긴급 상황에서 체력을 유지하기 위한 최후의 에너지원이기 때문에 중요하다. 종류: 고열량이며 장기 보관 가능한 말린 과일, 초콜릿, 에너지젤, 젤리, 에너지바 등.'},
+  {cat:'nutrition',q:'등산에서 단백질 보충이 중요한 이유를 설명하시오',
+   kw:{required:['근육','회복','면역'],optional:['근섬유','항체','에너지','지구력']},
+   a:'근육 회복·재생: 손상된 근섬유 회복, 근육통 감소. 에너지원: 탄수화물·지방 부족 시 에너지원으로 사용. 지구력 향상: 충분한 근육량으로 장시간 피로 감소. 면역력 강화: 항체·효소의 주성분.'},
+  {cat:'nutrition',q:'고소(高所)에서의 영양 관리를 설명하시오',
+   kw:{required:['기압','산소','식욕'],optional:['탄수화물','소화','수분','고열량']},
+   a:'고도가 높아질수록 기압↓ 산소↓ → 식욕 감소, 소화 기능 저하. 소화하기 쉬운 탄수화물 위주 식단 권장. 건조한 고소 환경과 호흡 시 수분 손실↑ → 적극적 수분 보충. 고열량·소용량 식품(초콜릿, 에너지젤) 추천.'},
+
+  // ── 장비 추가 ──
+  {cat:'gear',q:'다이나믹 로프와 스태틱 로프의 차이와 신장율을 설명하시오',
+   kw:{required:['다이나믹','스태틱','신장'],optional:['6%','5%','충격','하강']},
+   a:'다이나믹 로프: 신장률 6~7%, 추락 충격 흡수, 등반·빌레이용. 스태틱 로프: 신장률 5% 이하, 충격 흡수 기능 없음, 하강·구조·짐 운반용. 정적 로프를 등반용으로 사용하면 위험하다.'},
+  {cat:'gear',q:'싱글·하프·더블(트윈) 로프의 차이를 설명하시오',
+   kw:{required:['싱글','하프','더블'],optional:['9mm','번갈아','동시','아이스']},
+   a:'싱글(9~10.5mm): 단일 로프, 스포츠클라이밍·실내 암벽, 사용 간단. 하프(8~9mm): 두 로프를 번갈아 클립, 알파인·멀티피치. 더블/트윈(7~8mm): 두 로프를 같은 확보물에 동시 클립, 아이스클라이밍.'},
+  {cat:'gear',q:'클라이밍 로프의 정적 신장력, 동적 신장력에 대한 UIAA 기준을 설명하시오',
+   kw:{required:['UIAA','정적','동적'],optional:['10%','추락','5회','12kN']},
+   a:'UIAA 기준 정적 신장력: 싱글 로프 10% 이하. 동적 신장력: 추락 5회 이상 견뎌야 하며, 충격력 12kN 이하. 이 기준을 만족해야 등반용 로프로 인정된다.'},
+  {cat:'gear',q:'로프 사리는 방법의 종류와 장단점을 설명하시오',
+   kw:{required:['나비','원형','꼬임'],optional:['8자','코일','손상','빠르게']},
+   a:'원형 사리기(코일): 빠르게 사릴 수 있지만 꼬임 발생 가능. 나비형 사리기(Butterfly Coil): 8자 형태로 사림, 풀 때 꼬임 없이 부드럽게 풀림, 손상 적음. 긴 로프는 나비형 권장.'},
+  {cat:'gear',q:'튜브형 하강기(ATC)의 속도 조절 원리를 설명하시오',
+   kw:{required:['마찰','제동손','속도'],optional:['로프','ATC','열','장갑']},
+   a:'원리: 마찰력을 이용하여 로프 하강 속도 조절. 로프를 하강기 구멍에 통과 → 몸체를 감싸며 꺾임 → 마찰 지점 생성. 제동손으로 강하게 잡으면 마찰↑ 속도↓. 마찰로 열 발생 → 장갑 착용 필수.'},
+  {cat:'gear',q:'내부 프레임 배낭의 특징을 설명하시오',
+   kw:{required:['밀착','안정','프레임'],optional:['내부','균형','활동','무게']},
+   a:'프레임이 배낭 내부에 있어 체형에 밀착된다. 균형감이 좋고 몸과의 일체감이 높다. 활동적인 산행·암벽 등반에 유리. 무거운 짐을 지더라도 무게가 허리·엉덩이로 고르게 분산된다.'},
+  {cat:'gear',q:'대형 배낭 힙벨트의 사용 목적을 설명하시오',
+   kw:{required:['어깨','엉덩이','분산'],optional:['70%','하중','균형','피로']},
+   a:'배낭 무게의 약 70~80%를 어깨에서 엉덩이·다리로 분산시킨다. 어깨·등 피로를 대폭 감소시키고 장시간 산행에서의 편안함을 유지한다. 배낭 흔들림 방지, 무게 중심을 낮춰 균형감 향상.'},
+  {cat:'gear',q:'배낭 토르소(Torso Length)에 대해 설명하시오',
+   kw:{required:['C7','장골능','등길이'],optional:['경추','토르소','조절','허리']},
+   a:'사용자의 등 길이 = 목 뒤 C7(경추 7번) 돌출부 ~ 장골능(iliac crest) 위. 토르소에 맞는 배낭 선택·조절 → 어깨·허리 부담 최소화. 대형 배낭은 등판 길이 조절 기능 있음.'},
+  {cat:'gear',q:'UIAA에서 규정한 등반을 위한 카라비너의 규격을 설명하시오',
+   kw:{required:['20kN','7kN','게이트'],optional:['세로','가로','열린','UIAA']},
+   a:'UIAA 기준: 세로 방향 20kN 이상, 가로 방향 7kN 이상, 게이트 열린 상태 7kN 이상이어야 한다. 이 기준을 모두 충족해야 등반용 카라비너로 인정된다.'},
+  {cat:'gear',q:'슬링(Sling)의 역할과 사용 시 주의사항을 설명하시오',
+   kw:{required:['연결','마찰','저항'],optional:['웨빙','카라비너','볼트','자외선']},
+   a:'확보물과 카라비너를 연결하거나 볼트 라인이 꺾인 곳에서 로프 저항을 감소시키는 역할. 주의: 자외선 노출로 강도 약화 → 기존 암벽 코스 슬링 가급적 사용 자제. 웨빙은 등반용 로프로 사용 금지.'},
+];
+
+const scores = {};      // 문제별 최고 점수 저장
+let examData = [];
+let examIdx = 0;
+let examResults = [];
+let examMode = 'random';
+let currentCat = 'all';
+
+function catBadge(cat){
+  return `<span class="badge ${BADGE[cat]||'b-c'}">${CAT[cat]||cat}</span>`;
+}
+
+// ── 키워드 매칭 채점 ──────────────────────────
+function gradeByKeyword(answer, kw){
+  const ans = answer.toLowerCase();
+  const req = kw.required || [];
+  const opt = kw.optional || [];
+
+  const hitReq = req.filter(k => ans.includes(k.toLowerCase()));
+  const hitOpt = opt.filter(k => ans.includes(k.toLowerCase()));
+  const missReq = req.filter(k => !ans.includes(k.toLowerCase()));
+  const missOpt = opt.filter(k => !ans.includes(k.toLowerCase()));
+
+  const reqScore = req.length > 0 ? hitReq.length / req.length : 1;
+  const optScore = opt.length > 0 ? hitOpt.length / opt.length : 0;
+  const rawScore = reqScore * 0.7 + optScore * 0.3;
+
+  let score;
+  if(rawScore >= 0.9) score = 5;
+  else if(rawScore >= 0.7) score = 4;
+  else if(rawScore >= 0.5) score = 3;
+  else if(rawScore >= 0.3) score = 2;
+  else score = 1;
+
+  const stars = '⭐'.repeat(score) + '☆'.repeat(5-score);
+  const msgs = {
+    5:'완벽해요! 핵심 내용을 모두 포함했어요.',
+    4:'잘 답변했어요! 대부분의 핵심을 포함했어요.',
+    3:'기본 개념은 맞았지만 핵심 키워드가 일부 빠졌어요.',
+    2:'핵심 키워드가 많이 빠졌어요. 다시 공부해보세요.',
+    1:'핵심 내용이 포함되지 않았어요. 모범 답안을 확인하세요.',
+  };
+
+  return { score, stars, hitReq, missReq, hitOpt, missOpt, msg: msgs[score] };
+}
+
+// ── 문제 렌더링 ──────────────────────────────
+function renderPractice(cat='all'){
+  currentCat = cat;
+  const list = cat==='all' ? QA : QA.filter(q=>q.cat===cat);
+  document.getElementById('qcount').textContent = `총 ${list.length}문제`;
+  document.getElementById('practice-list').innerHTML = list.map((item)=>{
+    const gi = QA.indexOf(item);
+    const sc = scores[gi];
+    const scTag = sc ? `<span style="font-size:11px;font-weight:600;color:${sc>=4?'#1D9E75':sc>=3?'#BA7517':'#A32D2D'}">${'⭐'.repeat(sc)}${sc}/5</span>` : '';
+    return `
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q${list.indexOf(item)+1}</span>
+        <div class="q-text">${item.q}</div>
+        ${catBadge(item.cat)}${scTag}
+      </div>
+      <textarea id="ta-${gi}" placeholder="핵심 키워드를 포함해서 자유롭게 답변하세요..." rows="3"></textarea>
+      <p class="tip">💡 구술시험처럼 핵심 개념 위주로 답변해보세요</p>
+      <div class="btn-row">
+        <button class="btn btn-p btn-sm" onclick="grade(${gi})">✅ 채점하기</button>
+        <button class="btn btn-g btn-sm" onclick="toggleAnswer(${gi})">📖 모범 답안</button>
+      </div>
+      <div id="fb-${gi}"></div>
+      <div id="ans-${gi}" style="display:none;margin-top:8px;padding:10px 12px;background:var(--purple-light);border-radius:8px;font-size:13px;line-height:1.7;color:#3C3489">${item.a}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterQ(btn, cat){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderPractice(cat);
+}
+
+function grade(gi){
+  const ans = document.getElementById(`ta-${gi}`).value.trim();
+  if(!ans){ alert('답변을 먼저 입력해주세요!'); return; }
+
+  const item = QA[gi];
+  const r = gradeByKeyword(ans, item.kw);
+  scores[gi] = Math.max(scores[gi]||0, r.score);
+
+  const scoreClass = `score-${r.score}`;
+  document.getElementById(`fb-${gi}`).innerHTML = `
+    <div class="result-box">
+      <div class="result-header ${scoreClass}">
+        <span class="stars">${r.stars}</span>
+        <span style="font-size:13px;font-weight:700">${r.score}/5점</span>
+        <span style="margin-left:6px;font-size:12px">${r.msg}</span>
+      </div>
+      <div class="result-body">
+        <div style="margin-bottom:8px">
+          <span style="font-size:12px;font-weight:600;color:var(--text-sub)">필수 키워드</span>
+          <div class="kw-list">
+            ${item.kw.required.map(k=>`<span class="kw ${r.hitReq.includes(k)?'kw-hit':'kw-miss'}">${r.hitReq.includes(k)?'✓':'✗'} ${k}</span>`).join('')}
+          </div>
+        </div>
+        ${item.kw.optional.length>0?`
+        <div>
+          <span style="font-size:12px;font-weight:600;color:var(--text-sub)">추가 키워드</span>
+          <div class="kw-list">
+            ${item.kw.optional.map(k=>`<span class="kw ${r.hitOpt.includes(k)?'kw-hit':'kw-miss'}">${r.hitOpt.includes(k)?'✓':'✗'} ${k}</span>`).join('')}
+          </div>
+        </div>`:''}
+        ${r.missReq.length>0?`<div style="margin-top:8px;padding:8px 10px;background:var(--red-light);border-radius:8px;font-size:12px;color:#791F1F">❌ 빠진 핵심 키워드: <b>${r.missReq.join(', ')}</b></div>`:''}
+      </div>
+    </div>`;
+}
+
+function toggleAnswer(gi){
+  const el = document.getElementById(`ans-${gi}`);
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+// ── 모의고사 ─────────────────────────────────
+function setMode(el, mode){
+  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  examMode = mode;
+}
+
+function startExam(){
+  const count = parseInt(document.getElementById('exam-count').value);
+  let pool = [...QA];
+  if(examMode==='weak'){
+    pool.sort((a,b)=>{
+      const sa = scores[QA.indexOf(a)]||0;
+      const sb = scores[QA.indexOf(b)]||0;
+      return sa-sb;
+    });
+  } else {
+    pool = pool.sort(()=>Math.random()-.5);
+  }
+  examData = pool.slice(0,count);
+  examIdx=0; examResults=[];
+  renderExamQ();
+}
+
+function renderExamQ(){
+  const el = document.getElementById('exam-content');
+  if(examIdx>=examData.length){ showExamResult(); return; }
+  const item = examData[examIdx];
+  const pct = Math.round(examIdx/examData.length*100);
+  el.innerHTML=`
+    <div class="prog-wrap">
+      <div class="prog-info"><span>${examIdx+1} / ${examData.length} 문제</span>${catBadge(item.cat)}</div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q${examIdx+1}</span>
+        <div class="q-text">${item.q}</div>
+      </div>
+      <textarea id="exam-ta" placeholder="답변을 입력하세요..." rows="4"></textarea>
+      <p class="tip">💡 핵심 키워드를 포함해서 답변하세요</p>
+      <div id="exam-fb"></div>
+      <div class="btn-row" id="exam-btns">
+        <button class="btn btn-p" onclick="gradeExam()">✅ 채점 후 다음</button>
+        <button class="btn btn-g" onclick="skipExam()">건너뛰기 →</button>
+      </div>
+    </div>`;
+}
+
+function gradeExam(){
+  const ans = document.getElementById('exam-ta').value.trim();
+  if(!ans){ alert('답변을 입력해주세요!'); return; }
+  const item = examData[examIdx];
+  const r = gradeByKeyword(ans, item.kw);
+  scores[QA.indexOf(item)] = Math.max(scores[QA.indexOf(item)]||0, r.score);
+  examResults.push({item, ans, ...r});
+
+  const scoreClass = `score-${r.score}`;
+  document.getElementById('exam-fb').innerHTML=`
+    <div class="result-box">
+      <div class="result-header ${scoreClass}">
+        <span class="stars">${r.stars}</span>
+        <span style="font-size:13px;font-weight:700">${r.score}/5점</span>
+        <span style="margin-left:6px;font-size:12px">${r.msg}</span>
+      </div>
+      <div class="result-body">
+        <div class="kw-list">
+          ${item.kw.required.map(k=>`<span class="kw ${r.hitReq.includes(k)?'kw-hit':'kw-miss'}">${r.hitReq.includes(k)?'✓':'✗'} ${k}</span>`).join('')}
+        </div>
+        ${r.missReq.length>0?`<div style="margin-top:6px;padding:7px 10px;background:var(--red-light);border-radius:8px;font-size:12px;color:#791F1F">❌ 빠진 키워드: <b>${r.missReq.join(', ')}</b></div>`:''}
+      </div>
+    </div>`;
+  document.getElementById('exam-btns').innerHTML=`<button class="btn btn-p" onclick="nextExam()">다음 문제 →</button>`;
+}
+
+function skipExam(){
+  examResults.push({item:examData[examIdx],ans:'(건너뜀)',score:0,stars:'',msg:'건너뜀',hitReq:[],missReq:[],hitOpt:[],missOpt:[]});
+  nextExam();
+}
+function nextExam(){ examIdx++; renderExamQ(); }
+
+function showExamResult(){
+  document.getElementById('exam-content').innerHTML='';
+  const valid = examResults.filter(r=>r.score>0);
+  const avg = valid.length>0 ? (valid.reduce((s,r)=>s+r.score,0)/examResults.length).toFixed(1) : 0;
+  const high = valid.filter(r=>r.score>=4).length;
+  const mid = valid.filter(r=>r.score===3).length;
+  const low = valid.filter(r=>r.score<=2).length;
+
+  const rc = document.getElementById('result-content');
+  rc.innerHTML=`
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:44px;font-weight:700;color:var(--purple)">${avg}<span style="font-size:18px;color:var(--text-sub)">/5</span></div>
+      <div style="font-size:13px;color:var(--text-sub);margin-bottom:1rem">평균 점수 · ${examResults.length}문제 완료</div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-n" style="color:var(--teal)">${high}</div><div class="stat-l">우수(4~5점)</div></div>
+        <div class="stat"><div class="stat-n">${mid}</div><div class="stat-l">보통(3점)</div></div>
+        <div class="stat"><div class="stat-n" style="color:var(--red)">${low}</div><div class="stat-l">보완필요</div></div>
+      </div>
+    </div>
+    ${examResults.map((r,i)=>`
+      <div class="q-card">
+        <div class="q-header">
+          <span class="q-num">Q${i+1}</span>
+          <div class="q-text">${r.item.q}</div>
+          ${r.score>0?`<span style="font-size:12px;font-weight:600;color:${r.score>=4?'#1D9E75':r.score>=3?'#BA7517':'#A32D2D'}">${r.stars} ${r.score}/5</span>`:'<span style="font-size:11px;color:var(--text-sub)">건너뜀</span>'}
+        </div>
+        ${r.score>0?`
+          <div style="font-size:12px;color:var(--text-sub);margin-bottom:6px">내 답변: <span style="color:var(--text)">${r.ans.length>80?r.ans.slice(0,78)+'...':r.ans}</span></div>
+          <div class="kw-list">
+            ${r.item.kw.required.map(k=>`<span class="kw ${r.hitReq.includes(k)?'kw-hit':'kw-miss'}">${r.hitReq.includes(k)?'✓':'✗'} ${k}</span>`).join('')}
+          </div>`:''}
+        <div style="margin-top:8px;padding:8px 10px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--text-sub)">
+          📖 ${r.item.a}
+        </div>
+      </div>`).join('')}
+    <button class="btn btn-p" style="width:100%;margin-top:1rem" onclick="startExam()">🔄 다시 도전</button>`;
+
+  showTab('result', document.querySelector('.tab:nth-child(3)'));
+}
+
+function showTab(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  if(el) el.classList.add('active');
+}
+
+renderPractice('all');
+</script>
+</body>
+</html>
