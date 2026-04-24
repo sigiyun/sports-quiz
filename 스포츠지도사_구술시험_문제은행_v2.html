@@ -94,6 +94,31 @@
 </style>
 </head>
 <body>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAfOf0Ahqu8uvhR8QC7jMpA84hD1Jkodz4",
+    authDomain: "sports-quiz-60fae.firebaseapp.com",
+    databaseURL: "https://sports-quiz-60fae-default-rtdb.firebaseio.com",
+    projectId: "sports-quiz-60fae",
+    storageBucket: "sports-quiz-60fae.firebasestorage.app",
+    messagingSenderId: "97800422623",
+    appId: "1:97800422623:web:efaab425498ebeb9a9556a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  // 전역에서 접근할 수 있도록 window에 등록
+  window._fbDb  = db;
+  window._fbRef = ref;
+  window._fbOnValue = onValue;
+  window._fbReady = true;
+</script>
+
 <!-- ░░ LOGIN SCREEN ░░ -->
 <div id="login-screen" style="position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#2D2870 0%,#534AB7 55%,#7F77DD 100%);display:flex;align-items:center;justify-content:center;padding:1.5rem;">
   <div style="background:#fff;border-radius:20px;padding:2rem 1.75rem;width:100%;max-width:360px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.25);">
@@ -623,19 +648,30 @@ async function tryLogin(){
     sessionToken = token;
     currentPw = sessionKey;
 
-    // ⑩ 하트비트 — 30초마다 갱신
+    // ⑩ 실시간 세션 감지 (SDK) + 하트비트 병행
+    // SDK 실시간 감지: 강사님이 세션 삭제 시 즉시 로그아웃
+    const startRealtimeWatch = () => {
+      if(window._fbReady && window._fbDb){
+        const sessionRef = window._fbRef(window._fbDb, `sessions/${sessionKey}`);
+        window._fbOnValue(sessionRef, (snapshot) => {
+          const data = snapshot.val();
+          if(!data || data.token !== sessionToken){
+            clearInterval(heartbeatTimer);
+            alert('⚠️ 관리자에 의해 접속이 종료되었습니다.');
+            location.reload();
+          }
+        });
+      } else {
+        // SDK 준비 안 됐으면 1초 후 재시도
+        setTimeout(startRealtimeWatch, 1000);
+      }
+    };
+    startRealtimeWatch();
+
+    // 하트비트 — 30초마다 lastBeat 갱신 (세션 유지)
     heartbeatTimer = setInterval(async ()=>{
       try{
-        const cur = await fbGet(`sessions/${sessionKey}`);
-        if(cur && cur.token === sessionToken){
-          await fbSet(`sessions/${sessionKey}/lastBeat`, Date.now());
-        } else {
-          // 강사님이 세션 삭제 → 강제 로그아웃
-          clearInterval(heartbeatTimer);
-          clearInterval(watchTimer);
-          alert('⚠️ 관리자에 의해 접속이 종료되었습니다.');
-          location.reload();
-        }
+        await fbSet(`sessions/${sessionKey}/lastBeat`, Date.now());
       } catch(e){}
     }, HEARTBEAT_SEC * 1000);
 
