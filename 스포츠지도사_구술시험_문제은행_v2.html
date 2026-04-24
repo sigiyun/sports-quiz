@@ -103,16 +103,12 @@
     <div style="margin-bottom:12px;text-align:left">
       <label style="font-size:12px;font-weight:500;color:#6b6b8a;display:block;margin-bottom:5px">이름</label>
       <input id="login-name" type="text" placeholder="이름을 입력하세요"
-        style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;"
-        onfocus="this.style.borderColor='#534AB7'" onblur="this.style.borderColor='#e8e6f0'"
-        onkeydown="if(event.key==='Enter')document.getElementById('login-pw').focus()">
+        style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
     </div>
     <div style="margin-bottom:8px;text-align:left">
       <label style="font-size:12px;font-weight:500;color:#6b6b8a;display:block;margin-bottom:5px">비밀번호</label>
       <input id="login-pw" type="password" placeholder="비밀번호를 입력하세요"
-        style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;"
-        onfocus="this.style.borderColor='#534AB7'" onblur="this.style.borderColor='#e8e6f0'"
-        onkeydown="if(event.key==='Enter')tryLogin()">
+        style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
     </div>
     <p id="login-err" style="font-size:12px;color:#A32D2D;min-height:18px;margin-bottom:10px;text-align:left"></p>
     <button onclick="tryLogin()"
@@ -449,6 +445,22 @@ function checkOX(btn,val){
 }
 function nextOX(){oxIdx++;renderOX();}
 renderQBank('all');
+
+// 로그인 input 이벤트
+document.addEventListener('DOMContentLoaded', function(){
+  var ni = document.getElementById('login-name');
+  var pi = document.getElementById('login-pw');
+  if(ni){
+    ni.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
+    ni.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
+    ni.addEventListener('keydown', function(e){ if(e.key==='Enter') pi.focus(); });
+  }
+  if(pi){
+    pi.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
+    pi.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
+    pi.addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
+  }
+});
 
 // ── 수강생 코드 ──────────────────────────
 const STUDENT_CODES = {
