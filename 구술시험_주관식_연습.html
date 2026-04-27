@@ -598,6 +598,7 @@ function grade(gi){
   const item = QA[gi];
   const r = gradeByKeyword(ans, item.kw);
   scores[gi] = Math.max(scores[gi]||0, r.score);
+  saveProgress(gi, r.score);  // Firebase 저장
 
   const scoreClass = `score-${r.score}`;
   document.getElementById(`fb-${gi}`).innerHTML = `
@@ -685,7 +686,9 @@ function gradeExam(){
   if(!ans){ alert('답변을 입력해주세요!'); return; }
   const item = examData[examIdx];
   const r = gradeByKeyword(ans, item.kw);
+  const _eOrigIdx = QA_ORIG.indexOf(item);
   scores[QA.indexOf(item)] = Math.max(scores[QA.indexOf(item)]||0, r.score);
+  if(_eOrigIdx>=0) saveProgress(_eOrigIdx, r.score);  // Firebase 저장
   examResults.push({item, ans, ...r});
 
   const scoreClass = `score-${r.score}`;
@@ -795,6 +798,62 @@ const STUDENT_CODES = {
   'hong-2269':'홍승우',
 };
 const FB_URL = 'https://sports-quiz-60fae-default-rtdb.firebaseio.com';
+
+// ── Firebase 학습 기록 시스템 ──────────────────
+let currentStudent = null;  // 현재 로그인한 학생 코드
+let studentProgress = {};   // {문제인덱스: {score, tries, lastSeen}}
+
+// Firebase에서 학습 기록 불러오기
+async function loadProgress(pw) {
+  const key = pw.replace(/-/g, '_');
+  try {
+    const res = await fetch(`${FB_URL}/progress/${key}.json`);
+    const data = await res.json();
+    if (data) studentProgress = data;
+    else studentProgress = {};
+  } catch(e) { studentProgress = {}; }
+}
+
+// Firebase에 학습 기록 저장
+function saveProgress(qIdx, score) {
+  if (!currentStudent) return;
+  const key = currentStudent.replace(/-/g, '_');
+  const prev = studentProgress[qIdx] || {score: 0, tries: 0};
+  studentProgress[qIdx] = {
+    score: Math.max(prev.score, score),
+    tries: (prev.tries || 0) + 1,
+    lastSeen: Date.now()
+  };
+  // Firebase에 해당 문제만 업데이트
+  fetch(`${FB_URL}/progress/${key}/${qIdx}.json`, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(studentProgress[qIdx])
+  }).catch(() => {});
+}
+
+// 취약 문제 우선 정렬 (낮은 점수·많은 시도·오래된 문제 우선)
+function sortByWeakness() {
+  QA.sort((a, b) => {
+    const ai = QA_ORIG.indexOf(a);
+    const bi = QA_ORIG.indexOf(b);
+    const pa = studentProgress[ai];
+    const pb = studentProgress[bi];
+    // 한 번도 안 본 문제 최우선
+    if (!pa && pb) return -1;
+    if (pa && !pb) return 1;
+    if (!pa && !pb) return Math.random() - 0.5;
+    // 점수 낮은 것 우선
+    if (pa.score !== pb.score) return pa.score - pb.score;
+    // 시도 횟수 많은 것 우선 (자주 틀린 것)
+    return (pb.tries||0) - (pa.tries||0);
+  });
+}
+
+// QA 원본 순서 저장 (인덱스 기준으로 사용)
+const QA_ORIG = [...QA];
+// ────────────────────────────────────────────────
+
 // ─────────────────────────────────────────
 
 function tryLogin(){
@@ -817,8 +876,14 @@ function tryLogin(){
   }
 
   err.textContent='';
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('main-content').style.display='block';
+  currentStudent = pw;
+  loadProgress(pw).then(() => {
+    sortByWeakness();
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('main-content').style.display='block';
+    renderPractice('all');
+  });
+  return;
 
   // Firebase 기록
   try{
