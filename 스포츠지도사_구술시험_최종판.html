@@ -533,6 +533,376 @@ function makeChoice(item, liIdx) {
   return getLiText(item.a, liIdx);
 }
 
+// ── 보기 자동 변형 엔진 ──────────────────────────────
+// 숫자 변형 맵
+const NUM_MUTATE = [
+  ['100~120회','60~80회'], ['100~120회','140~160회'],
+  ['5~6cm','2~3cm'], ['5~6cm','8~10cm'],
+  ['20kN','10kN'], ['20kN','30kN'],
+  ['7kN','3kN'], ['7kN','15kN'],
+  ['5분','3분'], ['5분','10분'],
+  ['4분','2분'], ['4분','6분'],
+  ['6분','3분'], ['6분','10분'],
+  ['15m','10m'], ['15m','20m'],
+  ['12m','8m'], ['12m','20m'],
+  ['35도','38도'], ['35도','32도'],
+  ['40도','38도'], ['40도','43도'],
+  ['2%','5%'], ['4%','8%'],
+  ['20%','10%'], ['20%','30%'],
+  ['5cm','2cm'], ['5cm','10cm'],
+  ['30초','10초'], ['30초','60초'],
+  ['15초','5초'], ['15초','30초'],
+  ['70~80%','30~40%'], ['70~80%','90~100%'],
+  ['10년','5년'], ['1년','3년'],
+  ['1단계','4단계'], ['4단계','1단계'],
+  ['2~3개','1개'], ['2~3개','5개 이상'],
+];
+
+// 긍부정 변형 맵
+const NEG_MUTATE = [
+  ['해야 한다','하면 안 된다'],
+  ['하면 안 된다','해야 한다'],
+  ['필수','금지'],
+  ['금지','권장'],
+  ['권장','금지'],
+  ['가능','불가능'],
+  ['불가능','가능'],
+  ['안전하다','위험하다'],
+  ['위험하다','안전하다'],
+  ['낮다','높다'],
+  ['높다','낮다'],
+  ['넓을수록','좁을수록'],
+  ['좁을수록','넓을수록'],
+  ['많을수록','적을수록'],
+  ['적을수록','많을수록'],
+  ['증가','감소'],
+  ['감소','증가'],
+  ['먼저','나중에'],
+  ['나중에','먼저'],
+  ['앞','뒤'],
+  ['뒤','앞'],
+  ['올라갈수록','내려갈수록'],
+  ['내려갈수록','올라갈수록'],
+];
+
+// 순서 변형 (A→B를 B→A로)
+const ORDER_MUTATE = [
+  ['탄수화물 → 지방 → 단백질','지방 → 탄수화물 → 단백질'],
+  ['탄수화물 → 지방 → 단백질','단백질 → 탄수화물 → 지방'],
+  ['설명 → 시범 → 실시 → 교정','시범 → 실시 → 설명 → 교정'],
+  ['119 신고','즉시 약물 투여'],
+  ['30:2','2:30'],
+  ['엉덩이·등','손·팔꿈치'],
+];
+
+// 핵심어 교체 맵 (비슷해 보이지만 틀린 단어)
+const KEYWORD_MUTATE = [
+  ['동적 로프','정적 로프'],
+  ['정적 로프','동적 로프'],
+  ['스크류락','오토락'],
+  ['D형','오벌형'],
+  ['HMS형','D형'],
+  ['시트 하네스','체스트 하네스'],
+  ['전신 하네스','시트 하네스'],
+  ['인사이드','아웃사이드'],
+  ['아웃사이드','인사이드'],
+  ['힐훅','토훅'],
+  ['토훅','힐훅'],
+  ['다이나믹','스태틱'],
+  ['싱글 로프','하프 로프'],
+  ['하프 로프','더블 로프'],
+  ['완등','실패'],
+  ['TOP 홀드','출발 홀드'],
+  ['격리구역','경기구역'],
+  ['레드카드','옐로우카드'],
+  ['옐로우카드','레드카드'],
+  ['DNS','DQB'],
+  ['볼더링','리드'],
+  ['리드','스피드'],
+  ['행동주의','구성주의'],
+  ['인지주의','행동주의'],
+  ['구성주의','인지주의'],
+  ['일사병','열사병'],
+  ['열사병','일사병'],
+  ['저체온증','탈수증'],
+  ['동상','동창'],
+  ['A2 활차','A4 활차'],
+];
+
+function mutateText(text) {
+  // 랜덤으로 변형 방식 선택 (여러 개 시도)
+  const allMutations = [...NUM_MUTATE, ...NEG_MUTATE, ...ORDER_MUTATE, ...KEYWORD_MUTATE];
+  // 섞어서 적용 가능한 첫 번째 변형 사용
+  const shuffled = allMutations.sort(() => Math.random() - .5);
+  for (const [from, to] of shuffled) {
+    if (text.includes(from)) {
+      return text.replace(from, to);
+    }
+  }
+  return null; // 변형 불가
+}
+
+function getLiTexts(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  const lis = [...d.querySelectorAll('li')];
+  if (lis.length) return lis.map(li => li.textContent.replace(/\s+/g,' ').trim());
+  return [d.textContent.replace(/\s+/g,' ').trim()];
+}
+
+function shorten(t) { return t.length > 75 ? t.slice(0,73)+'…' : t; }
+
+// ── 핵심 문제 정교한 오답 DB ────────────────────────
+// q(문제 키워드 일부)로 매칭, wrongs는 정교하게 만든 오답 3개
+const EXPERT_WRONG = [
+  { key:'CPR(심폐소생술)',
+    wrongs:[
+      '먼저 기도를 열고 인공호흡 5회 실시 후 가슴 압박을 시작한다',
+      '가슴 압박은 분당 60~80회, 깊이 3~4cm로 실시한다',
+      '119 신고 전 반드시 가족에게 먼저 연락하고 심폐소생술을 시작한다',
+    ]},
+  { key:'볼더링 성공(완등)',
+    wrongs:[
+      'TOP 홀드에 한 손으로 안정적으로 매달린 자세를 취한 경우',
+      '출발 홀드에서 3초 이상 버틴 후 어떤 자세든 완등으로 인정된다',
+      '볼더 꼭대기에서 두 발을 모아 서있어야만 완등으로 인정된다',
+    ]},
+  { key:'볼더링 경기 실패',
+    wrongs:[
+      '지면에서 떠난 후 TOP 홀드 이전에 손을 놓은 경우',
+      '등반 허용시간은 예선·결승 모두 동일하게 5분이다',
+      '불법적인 도움을 받아도 완등했다면 성공으로 인정된다',
+    ]},
+  { key:'카라비너의 종류',
+    wrongs:[
+      '스크류락은 자동으로 잠기며 게이트를 밀어서 여는 방식이다',
+      'D형은 좌우 대칭으로 도르래나 확보 장비 연결에 용이하다',
+      'HMS형은 비대칭 D자 형태로 가장 강도가 높아 많이 사용된다',
+    ]},
+  { key:'카라비너 UIAA',
+    wrongs:[
+      'UIAA 기준: 세로 12kN 이상, 가로 5kN 이상이어야 한다',
+      'UIAA 기준: 세로 20kN 이상, 가로 7kN 이상, 게이트 열린 상태 3kN 이상이어야 한다',
+      'UIAA 기준: 세로 7kN 이상, 가로 20kN 이상이어야 한다',
+    ]},
+  { key:'일사병과 열사병',
+    wrongs:[
+      '일사병은 의식이 없고 체온이 40도 이상으로 즉시 119 신고가 필요하다',
+      '열사병은 충분한 수분 보충만으로 빠르게 회복이 가능하다',
+      '일사병과 열사병 모두 그늘로 옮겨 수분을 보충하면 자연 회복된다',
+    ]},
+  { key:'저체온증',
+    wrongs:[
+      '저체온증은 반드시 영하의 기온에서만 발생하며, 기온이 0도 이상이면 안전하다',
+      '저체온증 응급처치 시 마찰을 가해 체온을 빠르게 올려야 한다',
+      '저체온증 증상은 땀이 많이 나고 몸이 뜨거워지는 것으로 시작된다',
+    ]},
+  { key:'수분 부족(탈수)',
+    wrongs:[
+      '체수분 10% 손실 시 사망 위험이 있어 즉시 병원을 가야 한다',
+      '갈증을 느낄 때 수분을 보충하면 충분하며, 미리 마실 필요는 없다',
+      '체수분 4% 손실 시 현기증·정신 장애가 나타나기 시작한다',
+    ]},
+  { key:'6대 영양소',
+    wrongs:[
+      '등산 시 에너지 소비 순서는 지방 → 탄수화물 → 단백질 순이다',
+      '6대 영양소는 탄수화물, 단백질, 지방, 비타민, 무기질, 섬유질이다',
+      '등산 시 에너지 소비 순서는 단백질 → 지방 → 탄수화물 순이다',
+    ]},
+  { key:'무기질(미네랄)',
+    wrongs:[
+      '칼슘 부족 시 빈혈과 어지럼증이 나타나며, 철분 부족 시 골다공증이 발생한다',
+      '나트륨은 등산 시 땀으로 손실되지 않으므로 별도의 보충이 필요 없다',
+      '마그네슘 부족은 시력 저하와 관련이 있으며 눈의 피로를 유발한다',
+    ]},
+  { key:'행동식과 비상식',
+    wrongs:[
+      '비상식은 매끼 섭취하는 주식으로, 조리가 필요한 고단백 식품이 좋다',
+      '행동식과 비상식은 동일한 개념으로 위급 상황과 이동 중 모두 사용한다',
+      '행동식은 반드시 조리 후 섭취해야 하며 생식은 영양 흡수가 어렵다',
+    ]},
+  { key:'사점(Dead Point)',
+    wrongs:[
+      '사점은 산행 중 체력이 완전히 소진된 상태로 반드시 하산해야 한다',
+      '세컨드 윈드는 사점 이후 실제로 체력이 완전히 회복되는 현상이다',
+      '사점은 산행 후반부에만 나타나며 초반에는 절대 발생하지 않는다',
+    ]},
+  { key:'레스트스텝',
+    wrongs:[
+      '레스트스텝은 두 발을 모아 잠깐 멈추고 허리를 굽혀 체중을 분산한다',
+      '레스트스텝 시 무릎을 구부려 근육에 힘을 유지하면서 잠시 쉰다',
+      '레스트스텝은 평지에서만 사용하는 기술로, 경사면에서는 효과가 없다',
+    ]},
+  { key:'워킹용 스틱',
+    wrongs:[
+      '스틱 길이는 오르막에서 길게, 내리막에서 짧게 조절해서 사용한다',
+      '스틱을 발보다 앞으로 나가도록 찍어야 추진력을 얻을 수 있다',
+      '스틱 손목걸이는 손목을 위에서 아래로 끼운 후 잡아야 한다',
+    ]},
+  { key:'FOP',
+    wrongs:[
+      'FOP는 관중석을 포함한 대회 전체 구역을 의미한다',
+      'FOP 내에서는 선수, 임원, 관중 모두 자유롭게 출입할 수 있다',
+      'FOP는 격리구역만을 의미하며 준비운동지역은 포함되지 않는다',
+    ]},
+  { key:'격리(Isolation)',
+    wrongs:[
+      '격리구역에서는 이미 시도한 선수가 아직 시도 안 한 선수에게 정보를 제공할 수 있다',
+      '격리 상태에서는 코치가 선수에게 루트 정보를 전달하는 것이 허용된다',
+      '격리구역 닫힌 후에도 외부에서 수집한 정보는 자유롭게 활용할 수 있다',
+    ]},
+  { key:'레드카드',
+    wrongs:[
+      '레드카드는 해당 라운드만 실격이며 다음 라운드에는 출전 가능하다',
+      '레드카드는 비스포츠 행동에만 부여되며 장비 규정 위반은 옐로우카드이다',
+      '한 대회에서 옐로우카드 3장을 받으면 레드카드와 동일하게 처리된다',
+    ]},
+  { key:'DNS',
+    wrongs:[
+      'DNS는 선수가 경기 도중 부상으로 기권한 경우만 해당된다',
+      'DNS 처리된 선수는 다음 라운드에 자동으로 출전하게 된다',
+      'DNS는 격리구역 입장 후 준비 중 포기한 경우에만 적용된다',
+    ]},
+  { key:'불법적인 도움',
+    wrongs:[
+      '코치가 손짓으로 루트를 알려주는 것은 허용된 범위의 응원이다',
+      '확보지점 로프를 발로 통제하는 것은 허용되나 손으로는 안 된다',
+      'T-너트는 홀드가 아니므로 발로 밟는 것은 불법 도움에 해당하지 않는다',
+    ]},
+  { key:'안전벨트(하네스)',
+    wrongs:[
+      '체스트 하네스는 단독으로 사용 가능하며 성인 클라이밍의 표준 장비이다',
+      '시트 하네스는 특수 상황용으로, 일반 클라이밍에서는 전신 하네스가 표준이다',
+      '전신 하네스는 어깨를 제외한 허리와 허벅지만 감싸는 형태이다',
+    ]},
+  { key:'로프 폐기',
+    wrongs:[
+      '로프는 외관상 손상이 없으면 사용 기간에 관계없이 계속 사용 가능하다',
+      '매일 사용하는 로프의 권장 교체 주기는 5년이다',
+      '추락 후에도 외피 손상이 없다면 계속 사용해도 안전하다',
+    ]},
+  { key:'동적 로프',
+    wrongs:[
+      '다이나믹 로프는 신장률이 1~2%로 매우 낮아 추락 충격을 효과적으로 차단한다',
+      '스태틱 로프는 신장률이 높아 추락 충격 흡수에 더 적합한 등반용 로프이다',
+      '등반 시 스태틱 로프와 다이나믹 로프 중 어느 것을 사용해도 무방하다',
+    ]},
+  { key:'리드 경기',
+    wrongs:[
+      '리드 경기 등반 준비시간은 예선 40초, 결승 20초로 다르게 적용된다',
+      '리드 경기에서 Z클립 발생 시 그 자리에서 즉시 실격 처리된다',
+      '리드 경기 순위는 완등한 선수 수가 같을 때 몸무게가 가벼운 선수가 유리하다',
+    ]},
+  { key:'볼더링 종목',
+    wrongs:[
+      '볼더링은 10~15m 높이의 인공벽을 로프 없이 오르는 종목이다',
+      '볼더링 결승 등반허용시간은 예선·준결승과 동일하게 5분이 주어진다',
+      '볼더링은 완등 수가 같을 때 시도 횟수가 많은 선수가 유리하다',
+    ]},
+  { key:'스피드 경기',
+    wrongs:[
+      '스피드 경기는 높이 10m, 기울기 90도의 인공벽에서 진행된다',
+      '스피드 경기는 자동계측 없이 스톱워치로 시간을 측정한다',
+      '스피드 경기 결승전은 완등 높이를 기준으로 순위를 결정한다',
+    ]},
+  { key:'조난 예방',
+    wrongs:[
+      '조난 발생 시 체력 보존보다 빠른 이동이 우선이므로 무조건 움직여야 한다',
+      '조난 시 구조대가 올 때까지 신호를 보내지 않고 체온 유지에만 집중한다',
+      '산행 계획서는 등산 후 귀가 시 제출하면 되며 사전 제출은 불필요하다',
+    ]},
+  { key:'볼더링 루트 설계',
+    wrongs:[
+      '볼더링 볼더 1개당 최대 손 홀드는 20개이며 한 라운드 평균 10~15개이다',
+      '볼더링 출발 홀드와 완등 홀드는 반드시 서로 다른 색상으로 표시해야 한다',
+      '존 홀드는 완등 홀드와 동일한 색으로 표시되어 선수가 구분하기 쉽게 한다',
+    ]},
+  { key:'클라이밍 지도법 4단계',
+    wrongs:[
+      '클라이밍 지도 순서는 교정 → 시범 → 설명 → 실시 순으로 진행한다',
+      '지도 4단계 중 가장 중요한 것은 설명 단계로 가장 많은 시간을 할애한다',
+      '교정 단계에서는 학습자의 오류를 바로잡지 않고 스스로 찾게 한다',
+    ]},
+  { key:'자유등반',
+    wrongs:[
+      '자유등반은 장비를 전혀 사용하지 않고 오르는 방식을 의미한다',
+      '자유등반에서 로프는 이동 수단으로도 사용할 수 있다',
+      '인공등반은 장비를 추락 방지 목적으로만 사용하는 등반이다',
+    ]},
+  { key:'사고 대처',
+    wrongs:[
+      '쇼크 환자는 앉은 자세를 유지하게 하고 머리를 발보다 높게 위치시킨다',
+      '의식불명 환자에게 수분 보충을 위해 소량의 물을 먹이는 것은 허용된다',
+      '들것으로 이동 시 머리가 앞으로 향하게 하여 환자 상태를 확인한다',
+    ]},
+];
+
+function findExpertWrongs(q) {
+  for (const entry of EXPERT_WRONG) {
+    if (q.q.includes(entry.key)) return entry.wrongs;
+  }
+  return null;
+}
+// ──────────────────────────────────────────────────────
+
+function makeWrongChoices(q, correctText, needed) {
+  const used = new Set([correctText]);
+  const result = [];
+
+  // ① 핵심 문제 정교한 오답 먼저 사용
+  const expertWrongs = findExpertWrongs(q);
+  if (expertWrongs) {
+    for (const w of expertWrongs.sort(() => Math.random() - .5)) {
+      if (result.length >= needed) break;
+      const s = shorten(w);
+      if (!used.has(s)) { used.add(s); result.push(s); }
+    }
+    if (result.length >= needed) return result.slice(0, needed);
+  }
+
+  // ② 정답 텍스트 자동 변형 (교묘한 오답)
+  const mutated = mutateText(correctText);
+  if (mutated && mutated !== correctText && !used.has(mutated)) {
+    used.add(mutated);
+    result.push(mutated);
+  }
+
+  // ② 정답의 다른 li 항목들을 변형
+  const allLis = getLiTexts(q.a);
+  for (const li of allLis.slice(1)) {
+    if (result.length >= needed) break;
+    const m = mutateText(li);
+    const candidate = m || li;
+    const s = shorten(candidate);
+    if (!used.has(s)) { used.add(s); result.push(s); }
+  }
+
+  // ③ 부족하면 같은 카테고리 문제의 첫 번째 li 사용
+  if (result.length < needed) {
+    const sameCat = QA.filter(x => x !== q && x.cat === q.cat).sort(() => Math.random()-.5);
+    for (const item of sameCat) {
+      if (result.length >= needed) break;
+      const lis = getLiTexts(item.a);
+      const raw = shorten(lis[0]);
+      if (!used.has(raw)) { used.add(raw); result.push(raw); }
+    }
+  }
+
+  // ④ 그래도 부족하면 전체에서 보충
+  if (result.length < needed) {
+    const others = QA.filter(x => x !== q && x.cat !== q.cat).sort(() => Math.random()-.5);
+    for (const item of others) {
+      if (result.length >= needed) break;
+      const lis = getLiTexts(item.a);
+      const raw = shorten(lis[0]);
+      if (!used.has(raw)) { used.add(raw); result.push(raw); }
+    }
+  }
+
+  return result.slice(0, needed);
+}
+// ─────────────────────────────────────────────────────
+
 function renderQuiz(){
   const el = document.getElementById('quiz-content');
   if(quizIdx >= quizData.length){
@@ -552,40 +922,16 @@ function renderQuiz(){
 
   const q = quizData[quizIdx];
 
-  // ── 정답 텍스트: li 전체를 이어붙인 요약 ──
-  const ansDiv = document.createElement('div');
-  ansDiv.innerHTML = q.a;
-  const ansItems = [...ansDiv.querySelectorAll('li')];
-  // 보기로 쓸 정답: 첫 번째 li (핵심 내용)
-  const correctText = ansItems.length
-    ? ansItems[0].textContent.replace(/\s+/g,' ').trim()
-    : ansDiv.textContent.replace(/\s+/g,' ').trim();
-  const correctShort = correctText.length > 72 ? correctText.slice(0,70)+'…' : correctText;
+  // 정답 텍스트 (첫 번째 li)
+  const allLis = getLiTexts(q.a);
+  const correctText = shorten(allLis[0]);
 
-  // ── 오답 3개: 같은 cat 우선, 부족하면 전체에서 보충 ──
-  const sameCat = QA.filter(x => x !== q && x.cat === q.cat);
-  const otherCat = QA.filter(x => x !== q && x.cat !== q.cat);
-  const pool = [...sameCat.sort(()=>Math.random()-.5), ...otherCat.sort(()=>Math.random()-.5)];
-
-  // 오답 보기: 각 항목의 '첫 번째 li'를 사용 (중복 제거)
-  const wrongChoices = [];
-  const usedTexts = new Set([correctShort]);
-  for(const item of pool){
-    if(wrongChoices.length >= 3) break;
-    const d = document.createElement('div');
-    d.innerHTML = item.a;
-    const lis = [...d.querySelectorAll('li')];
-    const raw = lis.length ? lis[0].textContent.replace(/\s+/g,' ').trim() : d.textContent.replace(/\s+/g,' ').trim();
-    const short = raw.length > 72 ? raw.slice(0,70)+'…' : raw;
-    if(!usedTexts.has(short)){
-      usedTexts.add(short);
-      wrongChoices.push(short);
-    }
-  }
+  // 교묘한 오답 3개 생성
+  const wrongChoices = makeWrongChoices(q, correctText, 3);
 
   // 4개 섞기
   const choices = [
-    {text: correctShort, correct: true},
+    {text: correctText, correct: true},
     ...wrongChoices.map(t => ({text: t, correct: false}))
   ].sort(() => Math.random() - .5);
 
