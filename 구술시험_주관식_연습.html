@@ -857,6 +857,7 @@ function tryLogin(){
   const name = document.getElementById('login-name').value.trim();
   const pw   = document.getElementById('login-pw').value.trim();
   const err  = document.getElementById('login-err');
+  const btn  = document.querySelector('#login-screen button');
 
   if(!name){ err.textContent='이름을 입력해 주세요.'; return; }
   if(!pw)  { err.textContent='비밀번호를 입력해 주세요.'; return; }
@@ -872,33 +873,74 @@ function tryLogin(){
     return;
   }
 
+  btn.textContent='확인 중...';
+  btn.disabled = true;
   err.textContent='';
-  currentStudent = pw;
-  loadProgress(pw).then(() => {
-    sortByWeakness();
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('main-content').style.display='block';
-    renderPractice('all');
-  });
-  return;
 
-  // Firebase 기록
-  try{
-    const now = new Date();
-    const time = now.getFullYear()+'-'
-      +String(now.getMonth()+1).padStart(2,'0')+'-'
-      +String(now.getDate()).padStart(2,'0')+' '
-      +String(now.getHours()).padStart(2,'0')+':'
-      +String(now.getMinutes()).padStart(2,'0')+':'
-      +String(now.getSeconds()).padStart(2,'0');
-    const device = /iPad|iPhone|iPod/.test(navigator.userAgent)?'iPhone'
-                 : /Android/.test(navigator.userAgent)?'Android':'PC';
-    fetch(FB_URL+'/logs.json',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name,time,device,page:'주관식연습'})
-    }).catch(()=>{});
-  }catch(e){}
+  const now    = new Date();
+  const time   = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+  const device = /iPad|iPhone|iPod/.test(navigator.userAgent)?'iPhone':/Android/.test(navigator.userAgent)?'Android':'PC';
+  const sessionKey = pw.replace(/-/g,'_');
+  const token  = Math.random().toString(36).slice(2)+Date.now().toString(36);
+
+  fetch(FB_URL+'/sessions/'+sessionKey+'.json')
+    .then(r=>r.json())
+    .then(existing=>{
+      if(existing && existing.token){
+        const elapsed = Date.now()-(existing.lastBeat||0);
+        if(elapsed < 5*60*1000){
+          err.textContent='⚠️ 이미 다른 기기('+existing.device+')에서 접속 중입니다. 해당 기기를 종료 후 다시 시도하세요.';
+          btn.textContent='입장하기';
+          btn.disabled=false;
+          return Promise.reject('block');
+        }
+      }
+      return fetch(FB_URL+'/sessions/'+sessionKey+'.json',{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name,token,time,device,lastBeat:Date.now()})
+      });
+    })
+    .then(res=>{
+      if(!res) return;
+      fetch(FB_URL+'/logs.json',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name,time,device})
+      }).catch(()=>{});
+
+      currentStudent = pw;
+
+      setInterval(()=>{
+        fetch(FB_URL+'/sessions/'+sessionKey+'.json')
+          .then(r=>r.json())
+          .then(cur=>{
+            if(!cur||cur.token!==token){ alert('⚠️ 관리자에 의해 접속이 종료되었습니다.'); location.reload(); return; }
+            fetch(FB_URL+'/sessions/'+sessionKey+'/lastBeat.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:Date.now().toString()}).catch(()=>{});
+          }).catch(()=>{});
+      },30000);
+
+      window.addEventListener('beforeunload',()=>{
+        navigator.sendBeacon(FB_URL+'/sessions/'+sessionKey+'.json',JSON.stringify(null));
+      });
+
+      loadProgress(pw).then(()=>{
+        sortByWeakness();
+        document.getElementById('login-screen').style.display='none';
+        document.getElementById('main-content').style.display='block';
+        renderPractice('all');
+      });
+    })
+    .catch(e=>{
+      if(e==='block') return;
+      currentStudent = pw;
+      loadProgress(pw).then(()=>{
+        sortByWeakness();
+        document.getElementById('login-screen').style.display='none';
+        document.getElementById('main-content').style.display='block';
+        renderPractice('all');
+      });
+    });
 }
 </script>
 </div><!-- /main-content -->
