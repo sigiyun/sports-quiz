@@ -874,12 +874,11 @@ function checkOX(btn,val){
   }
 }
 function nextOX(){oxIdx++;renderOX();}
-// 매번 문제 순서 랜덤 셔플
-QA.sort(() => Math.random() - 0.5);
-renderQBank('all');
-
 // 로그인 input 이벤트
 document.addEventListener('DOMContentLoaded', function(){
+  // 매번 문제 순서 랜덤 셔플 (로그인 후 sortByWeakness로 재정렬됨)
+  QA.sort(() => Math.random() - 0.5);
+
   var ni = document.getElementById('login-name');
   var pi = document.getElementById('login-pw');
   if(ni){
