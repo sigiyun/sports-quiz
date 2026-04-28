@@ -698,6 +698,221 @@ function shorten(t) { return t.length > 75 ? t.slice(0,73)+'…' : t; }
 
 // ── 핵심 문제 정교한 오답 DB ────────────────────────
 // q(문제 키워드 일부)로 매칭, wrongs는 정교하게 만든 오답 3개
+
+function makeWrongChoices(q, correctText, needed) {
+  const used = new Set([correctText]);
+  const result = [];
+
+  // ① 핵심 문제 정교한 오답 먼저 사용
+  const expertWrongs = findExpertWrongs(q);
+  if (expertWrongs) {
+    for (const w of expertWrongs.sort(() => Math.random() - .5)) {
+      if (result.length >= needed) break;
+      const s = shorten(w);
+      if (!used.has(s)) { used.add(s); result.push(s); }
+    }
+    if (result.length >= needed) return result.slice(0, needed);
+  }
+
+  // ② 정답 텍스트 자동 변형 (교묘한 오답)
+  const mutated = mutateText(correctText);
+  if (mutated && mutated !== correctText && !used.has(mutated)) {
+    used.add(mutated);
+    result.push(mutated);
+  }
+
+  // ② 정답의 다른 li 항목들을 변형
+  const allLis = getLiTexts(q.a);
+  for (const li of allLis.slice(1)) {
+    if (result.length >= needed) break;
+    const m = mutateText(li);
+    const candidate = m || li;
+    const s = shorten(candidate);
+    if (!used.has(s)) { used.add(s); result.push(s); }
+  }
+
+  // ③ 부족하면 같은 카테고리 문제의 첫 번째 li 사용
+  if (result.length < needed) {
+    const sameCat = QA.filter(x => x !== q && x.cat === q.cat).sort(() => Math.random()-.5);
+    for (const item of sameCat) {
+      if (result.length >= needed) break;
+      const lis = getLiTexts(item.a);
+      const raw = shorten(lis[0]);
+      if (!used.has(raw)) { used.add(raw); result.push(raw); }
+    }
+  }
+
+  // ④ 그래도 부족하면 전체에서 보충
+  if (result.length < needed) {
+    const others = QA.filter(x => x !== q && x.cat !== q.cat).sort(() => Math.random()-.5);
+    for (const item of others) {
+      if (result.length >= needed) break;
+      const lis = getLiTexts(item.a);
+      const raw = shorten(lis[0]);
+      if (!used.has(raw)) { used.add(raw); result.push(raw); }
+    }
+  }
+
+  return result.slice(0, needed);
+}
+// ─────────────────────────────────────────────────────
+
+function renderQuiz(){
+  const el = document.getElementById('quiz-content');
+  if(quizIdx >= quizData.length){
+    const pct = Math.round(quizScore/quizData.length*100);
+    el.innerHTML = `<div class="scorebox">
+      <span class="score-emoji">${pct>=80?'🏆':pct>=60?'😊':'📚'}</span>
+      <div class="scorenum">${quizScore} / ${quizData.length}점</div>
+      <div class="scoretext">${pct>=80?'훌륭해요! 합격권입니다!':pct>=60?'조금 더 복습하면 완벽해요!':'핵심 문제를 다시 공부해보세요!'}</div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-n">${quizScore}</div><div class="stat-l">정답</div></div>
+        <div class="stat"><div class="stat-n">${quizData.length-quizScore}</div><div class="stat-l">오답</div></div>
+        <div class="stat"><div class="stat-n">${pct}%</div><div class="stat-l">정답률</div></div>
+      </div>
+      <button class="navbtn p" onclick="startQuiz()">다시 풀기 ↺</button></div>`;
+    return;
+  }
+
+  const q = quizData[quizIdx];
+
+  // 정답 텍스트 (첫 번째 li)
+  const allLis = getLiTexts(q.a);
+  const correctText = shorten(allLis[0]);
+
+  // 교묘한 오답 3개 생성
+  const wrongChoices = makeWrongChoices(q, correctText, 3);
+
+  // 4개 섞기
+  const choices = [
+    {text: correctText, correct: true},
+    ...wrongChoices.map(t => ({text: t, correct: false}))
+  ].sort(() => Math.random() - .5);
+
+  quizAnswered = false;
+  const pct = Math.round(quizIdx / quizData.length * 100);
+
+  el.innerHTML = `
+    <div class="qprog">${quizIdx+1} / ${quizData.length} &nbsp;${catBadge(q.cat)}
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="qbig">❓ ${q.q}</div>
+    <p style="font-size:12px;color:var(--text-sub);margin-bottom:12px">아래 보기 중 올바른 답을 고르세요</p>
+    <div class="choices">${choices.map((c,i) =>
+      `<button class="chbtn" onclick="checkQ(this,${c.correct})">${['①','②','③','④'][i]} ${c.text}</button>`
+    ).join('')}</div>
+    <div class="fb" id="qfb"></div>
+    <div id="qans" style="display:none;margin-top:4px;margin-bottom:12px;padding:12px;background:#FAFAFE;border-radius:10px;border-left:3px solid var(--purple);font-size:13px;line-height:1.8">${q.a}</div>
+    <button class="navbtn p" id="qnext" style="display:none" onclick="nextQ()">다음 문제 →</button>`;
+}
+
+function checkQ(btn, correct){
+  if(quizAnswered) return;
+  quizAnswered = true;
+  document.querySelectorAll('.chbtn').forEach(b => b.style.pointerEvents = 'none');
+  const fb  = document.getElementById('qfb');
+  const ans = document.getElementById('qans');
+  const nxt = document.getElementById('qnext');
+  const _qOrigIdx = QA_ORIG.indexOf(quizData[quizIdx]);
+  if(correct){
+    btn.classList.add('correct');
+    quizScore++;
+    if(_qOrigIdx>=0) saveProgress(_qOrigIdx, 5);
+    fb.innerHTML = '<span style="color:#1D9E75;font-weight:500">✓ 정답입니다!</span>';
+  } else {
+    btn.classList.add('wrong');
+    if(_qOrigIdx>=0) saveProgress(_qOrigIdx, 1);
+    fb.innerHTML = '<span style="color:#A32D2D;font-weight:500">✗ 틀렸습니다. 아래 정답을 확인하세요.</span>';
+    // 정답 버튼 초록으로 강조
+    document.querySelectorAll('.chbtn').forEach(b => {
+      if(b !== btn) b.classList.add('correct-hint');
+    });
+  }
+  ans.style.display = 'block';
+  nxt.style.display = 'inline-block';
+}
+
+function nextQ(){quizIdx++;renderQuiz();}
+function startOX(){
+  oxData=[...OX].sort(()=>Math.random()-.5);
+  oxIdx=0;oxScore=0;renderOX();
+}
+function renderOX(){
+  const el=document.getElementById('ox-content');
+  if(oxIdx>=oxData.length){
+    const pct=Math.round(oxScore/oxData.length*100);
+    el.innerHTML=`<div class="scorebox">
+      <span class="score-emoji">${pct>=90?'🏆':pct>=70?'😊':'📚'}</span>
+      <div class="scorenum">${oxScore} / ${oxData.length}점</div>
+      <div class="scoretext">${pct>=90?'완벽한 이해도입니다!':pct>=70?'잘 했어요! 틀린 문제만 복습하세요.':'OX 개념을 다시 확인해보세요.'}</div>
+      <button class="navbtn p" onclick="startOX()">다시 풀기 ↺</button></div>`;
+    return;
+  }
+  const q=oxData[oxIdx];
+  el.innerHTML=`
+    <div class="qprog">OX ${oxIdx+1} / ${oxData.length} &nbsp;·&nbsp; 현재 ${oxScore}점<div class="prog-bar"><div class="prog-fill" style="width:${Math.round(oxIdx/oxData.length*100)}%"></div></div></div>
+    <div class="ox-q">${q.q}</div>
+    <div class="ox-btns"><button class="oxbtn" onclick="checkOX(this,true)">⭕</button><button class="oxbtn" onclick="checkOX(this,false)">❌</button></div>
+    <div class="fb" id="oxfb"></div>
+    <div class="ox-exp" id="oxexp">💡 ${q.ex}</div>
+    <button class="navbtn p" onclick="nextOX()">다음 →</button>`;
+}
+function checkOX(btn,val){
+  const q=oxData[oxIdx];
+  document.querySelectorAll('.oxbtn').forEach(b=>b.style.pointerEvents='none');
+  document.getElementById('oxexp').classList.add('show');
+  const fb=document.getElementById('oxfb');
+  const oxOrigIdx = OX.indexOf(q);
+  if(val===q.a){
+    btn.classList.add('correct');oxScore++;
+    if(oxOrigIdx>=0) saveProgress('ox_'+oxOrigIdx, 5);
+    fb.innerHTML='<span style="color:#1D9E75">✓ 정답!</span>';
+  } else {
+    btn.classList.add('wrong');
+    if(oxOrigIdx>=0) saveProgress('ox_'+oxOrigIdx, 1);
+    fb.innerHTML=`<span style="color:#A32D2D">✗ 틀렸습니다. 정답: ${q.a?'⭕':'❌'}</span>`;
+  }
+}
+function nextOX(){oxIdx++;renderOX();}
+// 매번 문제 순서 랜덤 셔플
+QA.sort(() => Math.random() - 0.5);
+renderQBank('all');
+
+// 로그인 input 이벤트
+document.addEventListener('DOMContentLoaded', function(){
+  var ni = document.getElementById('login-name');
+  var pi = document.getElementById('login-pw');
+  if(ni){
+    ni.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
+    ni.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
+    ni.addEventListener('keydown', function(e){ if(e.key==='Enter') pi.focus(); });
+  }
+  if(pi){
+    pi.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
+    pi.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
+    pi.addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
+  }
+});
+
+// ── 수강생 코드 ──────────────────────────
+const STUDENT_CODES = {
+  'kim-4493': '김진호',
+  'oh-4946':  '오혜진',
+  'yun-7007': '윤재원',
+  'jang-6656':'장미정',
+  'jang-6224':'장윤희',
+  'jang-7888':'장은정',
+  'jo-8925':  '조남석',
+  'jin-5569': '진광주',
+  'hong-2269':'홍승우',
+};
+const FB_URL = 'https://sports-quiz-60fae-default-rtdb.firebaseio.com';
+
+// ── Firebase 학습 기록 시스템 ──────────────────
+let currentStudent = null;  // 현재 로그인한 학생 코드
+let studentProgress = {};   // {문제인덱스: {score, tries, lastSeen}}
+
+// Firebase에서 학습 기록 불러오기
 const EXPERT_WRONG = [
   // ── 경기규정 ──
   {key:'스피드 경기에 대해',wrongs:['높이 10m, 기울기 90도의 인공벽에서 진행된다','완등한 높이를 기준으로 순위를 결정한다','자동계측시스템 없이 스톱워치로 시간을 측정한다']},
@@ -1071,220 +1286,7 @@ function findExpertWrongs(q) {
 }
 // ──────────────────────────────────────────────────────
 
-function makeWrongChoices(q, correctText, needed) {
-  const used = new Set([correctText]);
-  const result = [];
 
-  // ① 핵심 문제 정교한 오답 먼저 사용
-  const expertWrongs = findExpertWrongs(q);
-  if (expertWrongs) {
-    for (const w of expertWrongs.sort(() => Math.random() - .5)) {
-      if (result.length >= needed) break;
-      const s = shorten(w);
-      if (!used.has(s)) { used.add(s); result.push(s); }
-    }
-    if (result.length >= needed) return result.slice(0, needed);
-  }
-
-  // ② 정답 텍스트 자동 변형 (교묘한 오답)
-  const mutated = mutateText(correctText);
-  if (mutated && mutated !== correctText && !used.has(mutated)) {
-    used.add(mutated);
-    result.push(mutated);
-  }
-
-  // ② 정답의 다른 li 항목들을 변형
-  const allLis = getLiTexts(q.a);
-  for (const li of allLis.slice(1)) {
-    if (result.length >= needed) break;
-    const m = mutateText(li);
-    const candidate = m || li;
-    const s = shorten(candidate);
-    if (!used.has(s)) { used.add(s); result.push(s); }
-  }
-
-  // ③ 부족하면 같은 카테고리 문제의 첫 번째 li 사용
-  if (result.length < needed) {
-    const sameCat = QA.filter(x => x !== q && x.cat === q.cat).sort(() => Math.random()-.5);
-    for (const item of sameCat) {
-      if (result.length >= needed) break;
-      const lis = getLiTexts(item.a);
-      const raw = shorten(lis[0]);
-      if (!used.has(raw)) { used.add(raw); result.push(raw); }
-    }
-  }
-
-  // ④ 그래도 부족하면 전체에서 보충
-  if (result.length < needed) {
-    const others = QA.filter(x => x !== q && x.cat !== q.cat).sort(() => Math.random()-.5);
-    for (const item of others) {
-      if (result.length >= needed) break;
-      const lis = getLiTexts(item.a);
-      const raw = shorten(lis[0]);
-      if (!used.has(raw)) { used.add(raw); result.push(raw); }
-    }
-  }
-
-  return result.slice(0, needed);
-}
-// ─────────────────────────────────────────────────────
-
-function renderQuiz(){
-  const el = document.getElementById('quiz-content');
-  if(quizIdx >= quizData.length){
-    const pct = Math.round(quizScore/quizData.length*100);
-    el.innerHTML = `<div class="scorebox">
-      <span class="score-emoji">${pct>=80?'🏆':pct>=60?'😊':'📚'}</span>
-      <div class="scorenum">${quizScore} / ${quizData.length}점</div>
-      <div class="scoretext">${pct>=80?'훌륭해요! 합격권입니다!':pct>=60?'조금 더 복습하면 완벽해요!':'핵심 문제를 다시 공부해보세요!'}</div>
-      <div class="stat-grid">
-        <div class="stat"><div class="stat-n">${quizScore}</div><div class="stat-l">정답</div></div>
-        <div class="stat"><div class="stat-n">${quizData.length-quizScore}</div><div class="stat-l">오답</div></div>
-        <div class="stat"><div class="stat-n">${pct}%</div><div class="stat-l">정답률</div></div>
-      </div>
-      <button class="navbtn p" onclick="startQuiz()">다시 풀기 ↺</button></div>`;
-    return;
-  }
-
-  const q = quizData[quizIdx];
-
-  // 정답 텍스트 (첫 번째 li)
-  const allLis = getLiTexts(q.a);
-  const correctText = shorten(allLis[0]);
-
-  // 교묘한 오답 3개 생성
-  const wrongChoices = makeWrongChoices(q, correctText, 3);
-
-  // 4개 섞기
-  const choices = [
-    {text: correctText, correct: true},
-    ...wrongChoices.map(t => ({text: t, correct: false}))
-  ].sort(() => Math.random() - .5);
-
-  quizAnswered = false;
-  const pct = Math.round(quizIdx / quizData.length * 100);
-
-  el.innerHTML = `
-    <div class="qprog">${quizIdx+1} / ${quizData.length} &nbsp;${catBadge(q.cat)}
-      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
-    </div>
-    <div class="qbig">❓ ${q.q}</div>
-    <p style="font-size:12px;color:var(--text-sub);margin-bottom:12px">아래 보기 중 올바른 답을 고르세요</p>
-    <div class="choices">${choices.map((c,i) =>
-      `<button class="chbtn" onclick="checkQ(this,${c.correct})">${['①','②','③','④'][i]} ${c.text}</button>`
-    ).join('')}</div>
-    <div class="fb" id="qfb"></div>
-    <div id="qans" style="display:none;margin-top:4px;margin-bottom:12px;padding:12px;background:#FAFAFE;border-radius:10px;border-left:3px solid var(--purple);font-size:13px;line-height:1.8">${q.a}</div>
-    <button class="navbtn p" id="qnext" style="display:none" onclick="nextQ()">다음 문제 →</button>`;
-}
-
-function checkQ(btn, correct){
-  if(quizAnswered) return;
-  quizAnswered = true;
-  document.querySelectorAll('.chbtn').forEach(b => b.style.pointerEvents = 'none');
-  const fb  = document.getElementById('qfb');
-  const ans = document.getElementById('qans');
-  const nxt = document.getElementById('qnext');
-  const _qOrigIdx = QA_ORIG.indexOf(quizData[quizIdx]);
-  if(correct){
-    btn.classList.add('correct');
-    quizScore++;
-    if(_qOrigIdx>=0) saveProgress(_qOrigIdx, 5);
-    fb.innerHTML = '<span style="color:#1D9E75;font-weight:500">✓ 정답입니다!</span>';
-  } else {
-    btn.classList.add('wrong');
-    if(_qOrigIdx>=0) saveProgress(_qOrigIdx, 1);
-    fb.innerHTML = '<span style="color:#A32D2D;font-weight:500">✗ 틀렸습니다. 아래 정답을 확인하세요.</span>';
-    // 정답 버튼 초록으로 강조
-    document.querySelectorAll('.chbtn').forEach(b => {
-      if(b !== btn) b.classList.add('correct-hint');
-    });
-  }
-  ans.style.display = 'block';
-  nxt.style.display = 'inline-block';
-}
-
-function nextQ(){quizIdx++;renderQuiz();}
-function startOX(){
-  oxData=[...OX].sort(()=>Math.random()-.5);
-  oxIdx=0;oxScore=0;renderOX();
-}
-function renderOX(){
-  const el=document.getElementById('ox-content');
-  if(oxIdx>=oxData.length){
-    const pct=Math.round(oxScore/oxData.length*100);
-    el.innerHTML=`<div class="scorebox">
-      <span class="score-emoji">${pct>=90?'🏆':pct>=70?'😊':'📚'}</span>
-      <div class="scorenum">${oxScore} / ${oxData.length}점</div>
-      <div class="scoretext">${pct>=90?'완벽한 이해도입니다!':pct>=70?'잘 했어요! 틀린 문제만 복습하세요.':'OX 개념을 다시 확인해보세요.'}</div>
-      <button class="navbtn p" onclick="startOX()">다시 풀기 ↺</button></div>`;
-    return;
-  }
-  const q=oxData[oxIdx];
-  el.innerHTML=`
-    <div class="qprog">OX ${oxIdx+1} / ${oxData.length} &nbsp;·&nbsp; 현재 ${oxScore}점<div class="prog-bar"><div class="prog-fill" style="width:${Math.round(oxIdx/oxData.length*100)}%"></div></div></div>
-    <div class="ox-q">${q.q}</div>
-    <div class="ox-btns"><button class="oxbtn" onclick="checkOX(this,true)">⭕</button><button class="oxbtn" onclick="checkOX(this,false)">❌</button></div>
-    <div class="fb" id="oxfb"></div>
-    <div class="ox-exp" id="oxexp">💡 ${q.ex}</div>
-    <button class="navbtn p" onclick="nextOX()">다음 →</button>`;
-}
-function checkOX(btn,val){
-  const q=oxData[oxIdx];
-  document.querySelectorAll('.oxbtn').forEach(b=>b.style.pointerEvents='none');
-  document.getElementById('oxexp').classList.add('show');
-  const fb=document.getElementById('oxfb');
-  const oxOrigIdx = OX.indexOf(q);
-  if(val===q.a){
-    btn.classList.add('correct');oxScore++;
-    if(oxOrigIdx>=0) saveProgress('ox_'+oxOrigIdx, 5);
-    fb.innerHTML='<span style="color:#1D9E75">✓ 정답!</span>';
-  } else {
-    btn.classList.add('wrong');
-    if(oxOrigIdx>=0) saveProgress('ox_'+oxOrigIdx, 1);
-    fb.innerHTML=`<span style="color:#A32D2D">✗ 틀렸습니다. 정답: ${q.a?'⭕':'❌'}</span>`;
-  }
-}
-function nextOX(){oxIdx++;renderOX();}
-// 매번 문제 순서 랜덤 셔플
-QA.sort(() => Math.random() - 0.5);
-renderQBank('all');
-
-// 로그인 input 이벤트
-document.addEventListener('DOMContentLoaded', function(){
-  var ni = document.getElementById('login-name');
-  var pi = document.getElementById('login-pw');
-  if(ni){
-    ni.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
-    ni.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
-    ni.addEventListener('keydown', function(e){ if(e.key==='Enter') pi.focus(); });
-  }
-  if(pi){
-    pi.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
-    pi.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
-    pi.addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
-  }
-});
-
-// ── 수강생 코드 ──────────────────────────
-const STUDENT_CODES = {
-  'kim-4493': '김진호',
-  'oh-4946':  '오혜진',
-  'yun-7007': '윤재원',
-  'jang-6656':'장미정',
-  'jang-6224':'장윤희',
-  'jang-7888':'장은정',
-  'jo-8925':  '조남석',
-  'jin-5569': '진광주',
-  'hong-2269':'홍승우',
-};
-const FB_URL = 'https://sports-quiz-60fae-default-rtdb.firebaseio.com';
-
-// ── Firebase 학습 기록 시스템 ──────────────────
-let currentStudent = null;  // 현재 로그인한 학생 코드
-let studentProgress = {};   // {문제인덱스: {score, tries, lastSeen}}
-
-// Firebase에서 학습 기록 불러오기
 async function loadProgress(pw) {
   const key = pw.replace(/-/g, '_');
   try {
