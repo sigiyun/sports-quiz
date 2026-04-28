@@ -3,203 +3,189 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🧗 스포츠지도사 구술시험 문제은행 최종판</title>
+<title>🧗 스포츠지도사 구술시험 최종판</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-  :root {
-    --purple:#534AB7;--purple-light:#EEEDFE;--purple-mid:#7F77DD;
-    --teal:#1D9E75;--teal-light:#E1F5EE;
-    --amber:#BA7517;--amber-light:#FAEEDA;
-    --red:#A32D2D;--red-light:#FCEBEB;
-    --blue:#185FA5;--blue-light:#E6F1FB;
-    --green:#3B6D11;--green-light:#EAF3DE;
-    --coral:#993C1D;--coral-light:#FAECE7;
-    --bg:#F8F7FF;--surface:#fff;--text:#1a1a2e;--text-sub:#6b6b8a;--border:#e8e6f0;
-    --radius:14px;--shadow:0 2px 12px rgba(83,74,183,.08);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-  .hero{background:linear-gradient(135deg,#2D2870 0%,#534AB7 55%,#7F77DD 100%);padding:2rem 1.25rem 2.5rem;text-align:center;position:relative;overflow:hidden}
-  .hero::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06)}
-  .hero-emoji{font-size:44px;margin-bottom:.5rem;display:block}
-  .hero h1{font-size:20px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:.4rem}
-  .hero p{font-size:13px;color:rgba(255,255,255,.75)}
-  .hero-badges{display:flex;justify-content:center;gap:8px;margin-top:1rem;flex-wrap:wrap}
-  .hero-badge{background:rgba(255,255,255,.15);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.25)}
-  .tab-wrap{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(83,74,183,.06)}
-  .tabs{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 1rem}
-  .tabs::-webkit-scrollbar{display:none}
-  .tab{padding:.75rem 1rem;font-size:13px;font-weight:500;color:var(--text-sub);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .2s;flex-shrink:0}
-  .tab.active{color:var(--purple);border-bottom-color:var(--purple)}
-  .content{padding:1rem 1rem 5rem;max-width:680px;margin:0 auto}
-  .section{display:none}.section.visible{display:block}
-  .filter-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:1rem}
-  .filter-scroll::-webkit-scrollbar{display:none}
-  .fbtn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:var(--surface);color:var(--text-sub);white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
-  .fbtn.on{background:var(--purple);color:#fff;border-color:var(--purple);font-weight:500}
-  .qcount{font-size:12px;color:var(--text-sub);margin-bottom:.75rem}
-  .qcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:10px;box-shadow:var(--shadow)}
-  .qhead{display:flex;align-items:flex-start;gap:10px}
-  .qnum{font-size:11px;font-weight:700;color:var(--purple);background:var(--purple-light);padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:1px}
-  .qtxt{font-size:14px;font-weight:500;color:var(--text);line-height:1.55;flex:1}
-  .qmeta{display:flex;align-items:center;gap:8px;margin-top:8px}
-  .badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
-  .b-c{background:var(--purple-light);color:#3C3489}
-  .b-h{background:var(--teal-light);color:#085041}
-  .b-r{background:var(--amber-light);color:#633806}
-  .b-s{background:var(--red-light);color:#791F1F}
-  .b-n{background:var(--blue-light);color:#0C447C}
-  .b-t{background:var(--green-light);color:#27500A}
-  .b-g{background:var(--coral-light);color:#711B0C}
-  .abtn{padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text-sub);font-size:12px;cursor:pointer;width:100%;text-align:left;font-family:inherit;transition:background .15s;margin-top:10px}
-  .abtn:hover{background:var(--purple-light);color:var(--purple)}
-  .answer{margin-top:10px;padding:12px;background:#FAFAFE;border-radius:10px;border-left:3px solid var(--purple);font-size:13px;color:var(--text);line-height:1.8;display:none}
-  .answer.show{display:block}
-  .answer ul{padding-left:1.1rem}.answer li{margin-bottom:4px}.answer b{color:var(--purple)}
-  .quiz-controls{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
-  .ctl-label{font-size:12px;color:var(--text-sub)}
-  select{padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:inherit}
-  .btn-start{padding:7px 16px;border-radius:8px;background:var(--purple);color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
-  .qprog{font-size:12px;color:var(--text-sub);margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
-  .prog-bar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-  .prog-fill{height:100%;background:var(--purple);border-radius:2px;transition:width .3s}
-  .qbig{font-size:15px;font-weight:500;color:var(--text);margin-bottom:1.25rem;line-height:1.6;padding:1rem;background:var(--purple-light);border-radius:var(--radius);border-left:4px solid var(--purple)}
-  .choices{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
-  .chbtn{padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;text-align:left;font-family:inherit;line-height:1.45;transition:all .15s}
-  .chbtn:hover{border-color:var(--purple-mid);background:var(--purple-light)}
-  .chbtn.correct{background:var(--teal-light);border-color:var(--teal);color:#085041}
-  .chbtn.wrong{background:var(--red-light);border-color:var(--red);color:#791F1F}
-  .chbtn.correct-hint{background:var(--teal-light);border-color:var(--teal);color:#085041;opacity:.6}
-  .fb{font-size:13px;font-weight:500;min-height:20px;margin-bottom:10px}
-  .navbtn{padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;font-weight:500}
-  .navbtn.p{background:var(--purple);color:#fff;border-color:var(--purple)}
-  .scorebox{text-align:center;padding:2rem 1rem}
-  .score-emoji{font-size:48px;margin-bottom:.75rem;display:block}
-  .scorenum{font-size:36px;font-weight:700;color:var(--purple);margin-bottom:6px}
-  .scoretext{font-size:13px;color:var(--text-sub);margin-bottom:1.5rem}
-  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.5rem}
-  .stat{background:var(--bg);border-radius:10px;padding:.75rem;text-align:center;border:1px solid var(--border)}
-  .stat-n{font-size:22px;font-weight:700;color:var(--text)}
-  .stat-l{font-size:11px;color:var(--text-sub);margin-top:2px}
-  .ox-q{font-size:15px;font-weight:500;padding:1.25rem;background:var(--purple-light);border-radius:var(--radius);border-left:4px solid var(--purple);margin-bottom:1.25rem;line-height:1.6}
-  .ox-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
-  .oxbtn{padding:1.5rem 1rem;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--surface);font-size:40px;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
-  .oxbtn:hover{transform:scale(1.04)}
-  .oxbtn.correct{background:var(--teal-light);border-color:var(--teal)}
-  .oxbtn.wrong{background:var(--red-light);border-color:var(--red)}
-  .ox-exp{font-size:13px;color:var(--text-sub);padding:10px 12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);margin-bottom:10px;display:none}
-  .ox-exp.show{display:block}
-  .know-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:var(--surface);color:var(--text-sub);font-family:inherit;transition:all .15s}
-  .know-btn.known{background:#E1F5EE;color:#085041;border-color:#1D9E75;font-weight:500}
-  .qcard.known-card{opacity:.3;transition:opacity .2s}
-  .qcard.known-card:hover{opacity:.8}
-  .know-bar{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
-  .know-stat{font-size:12px;color:var(--text-sub)}
-  .know-progress{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:80px}
-  .know-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .4s}
-  .hide-known-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:var(--surface);color:var(--text-sub);font-family:inherit;transition:all .15s}
-  .hide-known-btn.active{background:var(--purple);color:#fff;border-color:var(--purple);font-weight:500}
-  .footer{text-align:center;padding:1.5rem 1rem;font-size:11px;color:var(--text-sub)}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+:root{--p:#534AB7;--pl:#EEEDFE;--pd:#2D2870;--t:#1D9E75;--tl:#E1F5EE;--a:#BA7517;--al:#FAEEDA;--r:#A32D2D;--rl:#FCEBEB;--bg:#F8F7FF;--s:#fff;--tx:#1a1a2e;--ts:#6b6b8a;--bd:#e8e6f0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+/* 로그인 */
+#login-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#2D2870,#534AB7 55%,#7F77DD);display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.login-box{background:#fff;border-radius:20px;padding:2rem 1.75rem;width:100%;max-width:360px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.login-box h2{font-size:18px;font-weight:700;color:#1a1a2e;margin:.5rem 0 .25rem}
+.login-box p{font-size:13px;color:#6b6b8a;margin-bottom:1.5rem}
+.login-label{font-size:12px;font-weight:500;color:#6b6b8a;display:block;margin-bottom:5px;text-align:left}
+.login-input{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;margin-bottom:12px;box-sizing:border-box}
+.login-input:focus{border-color:#534AB7}
+#login-err{font-size:12px;color:#A32D2D;min-height:18px;margin-bottom:10px;text-align:left;display:block}
+#login-btn{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#534AB7,#7F77DD);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.login-note{font-size:11px;color:#a0a0b8;margin-top:1rem}
+/* 메인 */
+#main-content{display:none}
+.hero{background:linear-gradient(135deg,#2D2870,#534AB7 55%,#7F77DD);padding:1.75rem 1.25rem;color:#fff}
+.hero h1{font-size:19px;font-weight:700;margin-bottom:4px}
+.hero p{font-size:12px;opacity:.75}
+.tab-wrap{background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(83,74,183,.06)}
+.tabs{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 1rem}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:.75rem 1rem;font-size:13px;font-weight:500;color:var(--ts);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;flex-shrink:0;transition:all .2s}
+.tab.on{color:var(--p);border-bottom-color:var(--p)}
+.content{padding:1rem;max-width:680px;margin:0 auto;padding-bottom:5rem}
+.sec{display:none}.sec.vis{display:block}
+/* 필터 */
+.filter-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:1rem}
+.filter-scroll::-webkit-scrollbar{display:none}
+.fbtn{padding:5px 12px;border-radius:20px;border:1px solid var(--bd);font-size:12px;cursor:pointer;background:#fff;color:var(--ts);white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
+.fbtn.on{background:var(--p);color:#fff;border-color:var(--p);font-weight:500}
+/* 카드 */
+.qcard{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:1rem 1.1rem;margin-bottom:10px;box-shadow:0 2px 8px rgba(83,74,183,.06)}
+.qhead{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.qnum{font-size:11px;font-weight:700;color:var(--p);background:var(--pl);padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:2px}
+.qtxt{font-size:14px;font-weight:500;line-height:1.55;flex:1}
+.badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
+.bc{background:var(--pl);color:#3C3489}.bh{background:var(--tl);color:#085041}
+.br{background:var(--al);color:#633806}.bs{background:var(--rl);color:#791F1F}
+.bn{background:#E6F1FB;color:#0C447C}.bt{background:#EAF3DE;color:#27500A}
+.bg2{background:#EAF3DE;color:#27500A}
+.abtn{padding:7px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ts);font-size:12px;cursor:pointer;width:100%;text-align:left;font-family:inherit;transition:background .15s;margin-top:8px}
+.abtn:hover{background:var(--pl);color:var(--p)}
+.answer{margin-top:10px;padding:12px;background:#FAFAFE;border-radius:10px;border-left:3px solid var(--p);font-size:13px;line-height:1.8;display:none}
+.answer.show{display:block}
+.answer ul{padding-left:1.1rem}.answer li{margin-bottom:4px}.answer b{color:var(--p)}
+/* 진행 바 */
+.knowbar{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
+.knowstat{font-size:12px;color:var(--ts)}
+.knowprog{flex:1;height:6px;background:var(--bd);border-radius:3px;overflow:hidden;min-width:80px}
+.knowfill{height:100%;background:var(--t);border-radius:3px;transition:width .4s}
+.knowbtn{padding:5px 14px;border-radius:20px;border:1px solid var(--bd);font-size:12px;cursor:pointer;background:#fff;color:var(--ts);font-family:inherit}
+.knowbtn.on{background:var(--p);color:#fff;border-color:var(--p);font-weight:500}
+.kbtn{padding:4px 10px;border-radius:16px;border:1px solid var(--bd);font-size:11px;cursor:pointer;background:#fff;color:var(--ts);font-family:inherit;transition:all .15s}
+.kbtn.known{background:var(--tl);color:#085041;border-color:var(--t);font-weight:500}
+.qcard.known-card{opacity:.3}
+/* 퀴즈 */
+.qprog{font-size:12px;color:var(--ts);margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.progbar{flex:1;height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
+.progfill{height:100%;background:var(--p);border-radius:2px;transition:width .3s}
+.qbig{font-size:15px;font-weight:500;padding:1rem;background:var(--pl);border-radius:14px;border-left:4px solid var(--p);margin-bottom:1.25rem;line-height:1.6}
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+.chbtn{padding:11px 14px;border-radius:10px;border:1px solid var(--bd);background:#fff;color:var(--tx);font-size:13px;cursor:pointer;text-align:left;font-family:inherit;line-height:1.45;transition:all .15s}
+.chbtn:hover{border-color:var(--p);background:var(--pl)}
+.chbtn.correct{background:var(--tl);border-color:var(--t);color:#085041}
+.chbtn.wrong{background:var(--rl);border-color:var(--r);color:#791F1F}
+.fb{font-size:13px;font-weight:500;min-height:20px;margin-bottom:10px}
+.navbtn{padding:10px 20px;border-radius:10px;border:1px solid var(--bd);background:#fff;font-size:13px;cursor:pointer;font-family:inherit;font-weight:500}
+.navbtn.p{background:var(--p);color:#fff;border-color:var(--p)}
+/* 결과 */
+.scorebox{text-align:center;padding:2rem 1rem}
+.scorenum{font-size:36px;font-weight:700;color:var(--p);margin-bottom:6px}
+.scoretxt{font-size:13px;color:var(--ts);margin-bottom:1.5rem}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.5rem}
+.stat{background:var(--bg);border-radius:10px;padding:.75rem;text-align:center;border:1px solid var(--bd)}
+.statn{font-size:22px;font-weight:700}.statl{font-size:11px;color:var(--ts);margin-top:2px}
+/* OX */
+.oxq{font-size:15px;font-weight:500;padding:1.25rem;background:var(--pl);border-radius:14px;border-left:4px solid var(--p);margin-bottom:1.25rem;line-height:1.6}
+.oxbtns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.oxbtn{padding:1.5rem 1rem;border-radius:14px;border:1.5px solid var(--bd);background:#fff;font-size:40px;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
+.oxbtn.correct{background:var(--tl);border-color:var(--t)}
+.oxbtn.wrong{background:var(--rl);border-color:var(--r)}
+.oxexp{font-size:13px;color:var(--ts);padding:10px 12px;background:#fff;border-radius:8px;border:1px solid var(--bd);margin-bottom:10px;display:none}
+.oxexp.show{display:block}
+/* 퀴즈 설정 */
+.quiz-ctrl{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.quiz-ctrl span{font-size:12px;color:var(--ts)}
+.quiz-ctrl select{padding:6px 10px;border-radius:8px;border:1px solid var(--bd);background:#fff;color:var(--tx);font-size:12px;font-family:inherit}
+.quiz-ctrl label{font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--ts)}
+.startbtn{padding:7px 16px;border-radius:8px;background:var(--p);color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.qans{display:none;margin-top:4px;margin-bottom:12px;padding:12px;background:#FAFAFE;border-radius:10px;border-left:3px solid var(--p);font-size:13px;line-height:1.8}
+.qans ul{padding-left:1.1rem}.qans li{margin-bottom:4px}.qans b{color:var(--p)}
 </style>
 </head>
 <body>
-<!-- ░░ LOGIN SCREEN ░░ -->
-<div id="login-screen" style="position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#2D2870 0%,#534AB7 55%,#7F77DD 100%);display:flex;align-items:center;justify-content:center;padding:1.5rem;">
-  <div style="background:#fff;border-radius:20px;padding:2rem 1.75rem;width:100%;max-width:360px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.25);">
-    <div style="font-size:48px;margin-bottom:.5rem">🧗</div>
-    <h2 style="font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:.25rem">구술시험 문제은행</h2>
-    <p style="font-size:13px;color:#6b6b8a;margin-bottom:1.5rem">인증된 수강생만 이용할 수 있습니다</p>
-    <div style="margin-bottom:12px;text-align:left">
-      <label style="font-size:12px;font-weight:500;color:#6b6b8a;display:block;margin-bottom:5px">이름</label>
-      <input id="login-name" type="text" placeholder="이름을 입력하세요"
-        style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-    </div>
-    <div style="margin-bottom:8px;text-align:left">
-      <label style="font-size:12px;font-weight:500;color:#6b6b8a;display:block;margin-bottom:5px">비밀번호</label>
-      <input id="login-pw" type="password" placeholder="비밀번호를 입력하세요"
-        style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-    </div>
-    <p id="login-err" style="font-size:12px;color:#A32D2D;min-height:18px;margin-bottom:10px;text-align:left"></p>
-    <button onclick="tryLogin()"
-      style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#534AB7,#7F77DD);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">
-      입장하기
-    </button>
-    <p style="font-size:11px;color:#a0a0b8;margin-top:1rem">비밀번호를 모르시면 담당 강사에게 문의하세요</p>
+
+<!-- 로그인 -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="font-size:48px">🧗</div>
+    <h2>구술시험 최종판</h2>
+    <p>인증된 수강생만 이용할 수 있습니다</p>
+    <label class="login-label">이름</label>
+    <input id="inp-name" class="login-input" type="text" placeholder="이름을 입력하세요">
+    <label class="login-label">비밀번호</label>
+    <input id="inp-pw" class="login-input" type="password" placeholder="비밀번호를 입력하세요">
+    <span id="login-err"></span>
+    <button id="login-btn">입장하기</button>
+    <p class="login-note">비밀번호를 모르시면 담당 강사에게 문의하세요</p>
   </div>
 </div>
-<div id="main-content" style="display:none">
+
+<!-- 메인 -->
+<div id="main-content">
 <div class="hero">
-  <span class="hero-emoji">🧗</span>
-  <h1>스포츠지도사 구술시험<br>문제은행 최종판</h1>
-  <p>2025 시험문제 + 기출문제 + 교재 완전 반영 총 <strong style="color:#fff">174문제</strong></p>
-  <div class="hero-badges">
-    <span class="hero-badge">생활·유소년·노인</span>
-    <span class="hero-badge">2025 시험 전범위</span>
-    <span class="hero-badge">기출 완전 수록</span>
-    <span class="hero-badge">OX 25문제</span>
-  </div>
+  <h1>🧗 스포츠지도사 구술시험 최종판</h1>
+  <p>2025 기출 + 교재 완전 반영 · 174문제 + OX 30문제</p>
 </div>
 <div class="tab-wrap">
   <div class="tabs">
-    <div class="tab active" onclick="showTab('qbank',this)">📚 문제은행 (102)</div>
-    <div class="tab" onclick="showTab('quiz',this)">✏️ 퀴즈 모드</div>
-    <div class="tab" onclick="showTab('ox',this)">⭕ OX 퀴즈</div>
+    <div class="tab on" onclick="showTab('qbank',this)">📚 문제은행</div>
+    <div class="tab" onclick="showTab('quiz',this)">✏️ 퀴즈모드</div>
+    <div class="tab" onclick="showTab('ox',this)">⭕ OX퀴즈</div>
   </div>
 </div>
 <div class="content">
-  <div id="qbank" class="section visible">
-    <!-- 진도 표시 바 -->
-    <div class="know-bar">
-      <span class="know-stat" id="know-stat">학습 진도: 0 / 0</span>
-      <div class="know-progress"><div class="know-fill" id="know-fill" style="width:0%"></div></div>
-      <button class="hide-known-btn" id="hide-known-btn" onclick="toggleHideKnown(this)">✅ 아는 문제 숨기기</button>
-      <button class="hide-known-btn" onclick="resetKnown()" style="color:var(--red);border-color:var(--red)">↺ 초기화</button>
+  <div id="qbank" class="sec vis">
+    <div class="knowbar">
+      <span class="knowstat" id="know-stat">학습 진도: 0 / 0</span>
+      <div class="knowprog"><div class="knowfill" id="know-fill" style="width:0%"></div></div>
+      <button class="knowbtn" id="hide-btn" onclick="toggleHide(this)">✅ 아는 문제 숨기기</button>
+      <button class="knowbtn" onclick="resetKnown()" style="color:var(--r)">↺ 초기화</button>
     </div>
     <div class="filter-scroll">
       <div class="fbtn on" onclick="filterQ(this,'all')">전체</div>
-      <div class="fbtn" onclick="filterQ(this,'climbing')">🧗 클라이밍 개념</div>
+      <div class="fbtn" onclick="filterQ(this,'climbing')">🧗 클라이밍</div>
       <div class="fbtn" onclick="filterQ(this,'rule')">📋 경기규정</div>
-      <div class="fbtn" onclick="filterQ(this,'safety')">⛑️ 안전·사고</div>
-      <div class="fbtn" onclick="filterQ(this,'hiking')">🏔️ 등산 지도</div>
-      <div class="fbtn" onclick="filterQ(this,'nutrition')">🥗 영양·에너지</div>
+      <div class="fbtn" onclick="filterQ(this,'safety')">⛑️ 안전</div>
+      <div class="fbtn" onclick="filterQ(this,'hiking')">🏔️ 등산</div>
+      <div class="fbtn" onclick="filterQ(this,'nutrition')">🥗 영양</div>
       <div class="fbtn" onclick="filterQ(this,'gear')">🔧 장비</div>
+      <div class="fbtn" onclick="filterQ(this,'teach')">📖 지도법</div>
     </div>
-    <div class="qcount" id="qcount"></div>
+    <div id="qcount" style="font-size:12px;color:var(--ts);margin-bottom:.75rem"></div>
     <div id="qlist"></div>
   </div>
-  <div id="quiz" class="section">
-    <div class="quiz-controls">
-      <span class="ctl-label">범위</span>
+  <div id="quiz" class="sec">
+    <div class="quiz-ctrl">
+      <span>범위</span>
       <select id="qcat">
-        <option value="all">전체 랜덤</option>
-        <option value="climbing">클라이밍 개념</option>
+        <option value="all">전체</option>
+        <option value="climbing">클라이밍</option>
         <option value="rule">경기규정</option>
-        <option value="safety">안전·사고</option>
-        <option value="hiking">등산 지도</option>
-        <option value="nutrition">영양·에너지</option>
+        <option value="safety">안전</option>
+        <option value="hiking">등산</option>
+        <option value="nutrition">영양</option>
         <option value="gear">장비</option>
+        <option value="teach">지도법</option>
       </select>
-      <span class="ctl-label">문제 수</span>
+      <span>문제 수</span>
       <select id="qnum">
         <option value="10">10문제</option>
         <option value="20">20문제</option>
         <option value="30">30문제</option>
-        <option value="102">전체</option>
+        <option value="999">전체</option>
       </select>
-      <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--text-sub)">
-        <input type="checkbox" id="skip-known" style="cursor:pointer"> 아는 문제 제외
-      </label>
-      <button class="btn-start" onclick="startQuiz()">시작 ▶</button>
+      <label><input type="checkbox" id="skip-known"> 아는 문제 제외</label>
+      <button class="startbtn" onclick="startQuiz()">시작 ▶</button>
     </div>
-    <div id="quiz-content"></div>
+    <div id="quiz-wrap"></div>
   </div>
-  <div id="ox" class="section"><div id="ox-content"></div></div>
+  <div id="ox" class="sec"><div id="ox-wrap"></div></div>
 </div>
-<div class="footer">2025 시험문제 + 기출문제 완전 반영 · 생활스포츠지도사 등산·클라이밍 구술시험 대비</div>
+</div><!-- /main-content -->
 
 <script>
-const CAT={climbing:'클라이밍 개념',rule:'경기규정',safety:'안전·사고',hiking:'등산 지도',nutrition:'영양·에너지',gear:'장비'};
-const BADGE={climbing:'b-c',rule:'b-r',safety:'b-s',hiking:'b-h',nutrition:'b-n',gear:'b-g'};
+const CAT={climbing:'클라이밍',rule:'경기규정',safety:'안전·사고',hiking:'등산',nutrition:'영양',gear:'장비',teach:'지도법'};
+const BDGE={climbing:'bc',rule:'br',safety:'bs',hiking:'bh',nutrition:'bn',gear:'bt',teach:'bg2'};
+const FB='https://sports-quiz-60fae-default-rtdb.firebaseio.com';
+const CODES={'kim-4493':'김진호','oh-4946':'오혜진','yun-7007':'윤재원','jang-6656':'장미정','jang-6224':'장윤희','jang-7888':'장은정','jo-8925':'조남석','jin-5569':'진광주','hong-2269':'홍승우'};
 
 const QA=[
 // ── 클라이밍 개념 ──
@@ -433,486 +419,6 @@ const OX=[
   {q:'온사이트(On-sight)는 루트에 대한 사전 정보를 가진 상태에서 첫 번째 시도에 완등하는 것이다',a:false,ex:'온사이트는 루트에 대한 사전 정보 없이 첫 번째 시도에 완등. 사전 정보가 있는 경우는 플래시(Flash)이다.'},
 ];
 
-let quizData=[],quizIdx=0,quizScore=0,quizAnswered=false;
-let oxData=[],oxIdx=0,oxScore=0;
-
-function showTab(id,el){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(id).classList.add('visible');
-  el.classList.add('active');
-  if(id==='quiz'&&quizData.length===0)startQuiz();
-  if(id==='ox')startOX();
-}
-function catBadge(cat){return `<span class="badge ${BADGE[cat]||'b-c'}">${CAT[cat]||cat}</span>`;}
-// ── 알고 있어요 기능 ──
-let knownSet = new Set(JSON.parse(localStorage.getItem('knownQ') || '[]'));
-let hideKnown = false;
-let currentCat = 'all';
-
-function saveKnown(){ try{ localStorage.setItem('knownQ', JSON.stringify([...knownSet])); }catch(e){} }
-
-function toggleKnown(idx, btn, card){
-  if(knownSet.has(idx)){
-    knownSet.delete(idx);
-    btn.textContent = '✅ 알고 있어요';
-    btn.classList.remove('known');
-    card.classList.remove('known-card');
-  } else {
-    knownSet.add(idx);
-    btn.textContent = '✅ 알고 있음!';
-    btn.classList.add('known');
-    card.classList.add('known-card');
-    if(hideKnown) card.style.display = 'none';
-  }
-  saveKnown();
-  updateKnowBar();
-}
-
-function toggleHideKnown(btn){
-  hideKnown = !hideKnown;
-  btn.classList.toggle('active', hideKnown);
-  btn.textContent = hideKnown ? '👁 전체 보기' : '✅ 아는 문제 숨기기';
-  document.querySelectorAll('.qcard').forEach(card => {
-    if(card.classList.contains('known-card')){
-      card.style.display = hideKnown ? 'none' : 'block';
-    }
-  });
-  updateKnowBar();
-}
-
-function resetKnown(){
-  if(!confirm('학습 진도를 초기화할까요?')) return;
-  knownSet.clear();
-  saveKnown();
-  renderQBank(currentCat);
-}
-
-function updateKnowBar(){
-  const list = currentCat === 'all' ? QA : QA.filter(q => q.cat === currentCat);
-  const total = list.length;
-  const known = list.filter((_, i) => {
-    const globalIdx = currentCat === 'all' ? i : QA.indexOf(list[i]);
-    return knownSet.has(currentCat === 'all' ? i : globalIdx);
-  }).length;
-  // 전체 기준으로 카운트
-  const knownAll = [...knownSet].filter(i => {
-    if(currentCat === 'all') return true;
-    return QA[i] && QA[i].cat === currentCat;
-  }).length;
-  const pct = total > 0 ? Math.round(knownAll / total * 100) : 0;
-  document.getElementById('know-stat').textContent = `학습 진도: ${knownAll} / ${total} (${pct}%)`;
-  document.getElementById('know-fill').style.width = pct + '%';
-  const visibleCount = total - (hideKnown ? knownAll : 0);
-  document.getElementById('qcount').textContent = `${visibleCount}문제 표시 중 (전체 ${total}문제)`;
-}
-
-function renderQBank(cat='all'){
-  currentCat = cat;
-  const list = cat === 'all' ? QA : QA.filter(q => q.cat === cat);
-  document.getElementById('qlist').innerHTML = list.map((item, i) => {
-    const globalIdx = QA.indexOf(item);
-    const isKnown = knownSet.has(globalIdx);
-    return `
-    <div class="qcard${isKnown ? ' known-card' : ''}" style="${isKnown && hideKnown ? 'display:none' : ''}">
-      <div class="qhead"><span class="qnum">Q${i+1}</span><div class="qtxt">${item.q}</div></div>
-      <div class="qmeta" style="justify-content:space-between;display:flex;align-items:center">
-        ${catBadge(item.cat)}
-        <button class="know-btn${isKnown ? ' known' : ''}"
-          onclick="toggleKnown(${globalIdx}, this, this.closest('.qcard'))">
-          ${isKnown ? '✅ 알고 있음!' : '✅ 알고 있어요'}
-        </button>
-      </div>
-      <button class="abtn" onclick="toggleAns(this)">▶ 정답 보기</button>
-      <div class="answer">${item.a}</div>
-    </div>`;
-  }).join('');
-  updateKnowBar();
-}
-function toggleAns(btn){
-  const a=btn.nextElementSibling;
-  a.classList.toggle('show');
-  btn.textContent=a.classList.contains('show')?'▼ 정답 닫기':'▶ 정답 보기';
-}
-function filterQ(btn,cat){
-  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  renderQBank(cat);
-}
-function startQuiz(){
-  const cat = document.getElementById('qcat')?.value || 'all';
-  const num = parseInt(document.getElementById('qnum')?.value || '10');
-  const skipKnown = document.getElementById('skip-known')?.checked || false;
-  let pool = cat === 'all' ? [...QA] : QA.filter(q => q.cat === cat);
-  // 아는 문제 제외 옵션
-  if(skipKnown){
-    pool = pool.filter(item => !knownSet.has(QA.indexOf(item)));
-    if(pool.length === 0){
-      document.getElementById('quiz-content').innerHTML =
-        `<div class="scorebox"><span class="score-emoji">🎉</span>
-        <div class="scorenum" style="font-size:20px">모든 문제를 알고 있어요!</div>
-        <div class="scoretext" style="margin-top:8px">문제은행에서 초기화 후 다시 도전하세요</div></div>`;
-      return;
-    }
-  }
-  quizData = pool.sort(() => Math.random() - .5).slice(0, Math.min(num, pool.length));
-  quizIdx = 0; quizScore = 0;
-  renderQuiz();
-}
-// li 항목들을 짧게 추출 — i번째 항목 반환
-function getLiText(html, idx) {
-  const d = document.createElement('div');
-  d.innerHTML = html;
-  const items = [...d.querySelectorAll('li')];
-  if (!items.length) {
-    const t = d.textContent.replace(/\s+/g,' ').trim();
-    return t.length > 70 ? t.slice(0,68)+'…' : t;
-  }
-  const t = items[idx % items.length].textContent.replace(/\s+/g,' ').trim();
-  return t.length > 70 ? t.slice(0,68)+'…' : t;
-}
-
-// 문제 하나의 "대표 답 보기 문장" 생성
-function makeChoice(item, liIdx) {
-  return getLiText(item.a, liIdx);
-}
-
-// ── 보기 자동 변형 엔진 ──────────────────────────────
-// 숫자 변형 맵
-const NUM_MUTATE = [
-  ['100~120회','60~80회'], ['100~120회','140~160회'],
-  ['5~6cm','2~3cm'], ['5~6cm','8~10cm'],
-  ['20kN','10kN'], ['20kN','30kN'],
-  ['7kN','3kN'], ['7kN','15kN'],
-  ['5분','3분'], ['5분','10분'],
-  ['4분','2분'], ['4분','6분'],
-  ['6분','3분'], ['6분','10분'],
-  ['15m','10m'], ['15m','20m'],
-  ['12m','8m'], ['12m','20m'],
-  ['35도','38도'], ['35도','32도'],
-  ['40도','38도'], ['40도','43도'],
-  ['2%','5%'], ['4%','8%'],
-  ['20%','10%'], ['20%','30%'],
-  ['5cm','2cm'], ['5cm','10cm'],
-  ['30초','10초'], ['30초','60초'],
-  ['15초','5초'], ['15초','30초'],
-  ['70~80%','30~40%'], ['70~80%','90~100%'],
-  ['10년','5년'], ['1년','3년'],
-  ['1단계','4단계'], ['4단계','1단계'],
-  ['2~3개','1개'], ['2~3개','5개 이상'],
-];
-
-// 긍부정 변형 맵
-const NEG_MUTATE = [
-  ['해야 한다','하면 안 된다'],
-  ['하면 안 된다','해야 한다'],
-  ['필수','금지'],
-  ['금지','권장'],
-  ['권장','금지'],
-  ['가능','불가능'],
-  ['불가능','가능'],
-  ['안전하다','위험하다'],
-  ['위험하다','안전하다'],
-  ['낮다','높다'],
-  ['높다','낮다'],
-  ['넓을수록','좁을수록'],
-  ['좁을수록','넓을수록'],
-  ['많을수록','적을수록'],
-  ['적을수록','많을수록'],
-  ['증가','감소'],
-  ['감소','증가'],
-  ['먼저','나중에'],
-  ['나중에','먼저'],
-  ['앞','뒤'],
-  ['뒤','앞'],
-  ['올라갈수록','내려갈수록'],
-  ['내려갈수록','올라갈수록'],
-];
-
-// 순서 변형 (A→B를 B→A로)
-const ORDER_MUTATE = [
-  ['탄수화물 → 지방 → 단백질','지방 → 탄수화물 → 단백질'],
-  ['탄수화물 → 지방 → 단백질','단백질 → 탄수화물 → 지방'],
-  ['설명 → 시범 → 실시 → 교정','시범 → 실시 → 설명 → 교정'],
-  ['119 신고','즉시 약물 투여'],
-  ['30:2','2:30'],
-  ['엉덩이·등','손·팔꿈치'],
-];
-
-// 핵심어 교체 맵 (비슷해 보이지만 틀린 단어)
-const KEYWORD_MUTATE = [
-  ['동적 로프','정적 로프'],
-  ['정적 로프','동적 로프'],
-  ['스크류락','오토락'],
-  ['D형','오벌형'],
-  ['HMS형','D형'],
-  ['시트 하네스','체스트 하네스'],
-  ['전신 하네스','시트 하네스'],
-  ['인사이드','아웃사이드'],
-  ['아웃사이드','인사이드'],
-  ['힐훅','토훅'],
-  ['토훅','힐훅'],
-  ['다이나믹','스태틱'],
-  ['싱글 로프','하프 로프'],
-  ['하프 로프','더블 로프'],
-  ['완등','실패'],
-  ['TOP 홀드','출발 홀드'],
-  ['격리구역','경기구역'],
-  ['레드카드','옐로우카드'],
-  ['옐로우카드','레드카드'],
-  ['DNS','DQB'],
-  ['볼더링','리드'],
-  ['리드','스피드'],
-  ['행동주의','구성주의'],
-  ['인지주의','행동주의'],
-  ['구성주의','인지주의'],
-  ['일사병','열사병'],
-  ['열사병','일사병'],
-  ['저체온증','탈수증'],
-  ['동상','동창'],
-  ['A2 활차','A4 활차'],
-];
-
-function mutateText(text) {
-  // 랜덤으로 변형 방식 선택 (여러 개 시도)
-  const allMutations = [...NUM_MUTATE, ...NEG_MUTATE, ...ORDER_MUTATE, ...KEYWORD_MUTATE];
-  // 섞어서 적용 가능한 첫 번째 변형 사용
-  const shuffled = allMutations.sort(() => Math.random() - .5);
-  for (const [from, to] of shuffled) {
-    if (text.includes(from)) {
-      return text.replace(from, to);
-    }
-  }
-  return null; // 변형 불가
-}
-
-function getLiTexts(html) {
-  const d = document.createElement('div');
-  d.innerHTML = html;
-  const lis = [...d.querySelectorAll('li')];
-  if (lis.length) return lis.map(li => li.textContent.replace(/\s+/g,' ').trim());
-  return [d.textContent.replace(/\s+/g,' ').trim()];
-}
-
-function shorten(t) { return t.length > 75 ? t.slice(0,73)+'…' : t; }
-
-// ── 핵심 문제 정교한 오답 DB ────────────────────────
-// q(문제 키워드 일부)로 매칭, wrongs는 정교하게 만든 오답 3개
-
-function makeWrongChoices(q, correctText, needed) {
-  const used = new Set([correctText]);
-  const result = [];
-
-  // ① 핵심 문제 정교한 오답 먼저 사용
-  const expertWrongs = findExpertWrongs(q);
-  if (expertWrongs) {
-    for (const w of expertWrongs.sort(() => Math.random() - .5)) {
-      if (result.length >= needed) break;
-      const s = shorten(w);
-      if (!used.has(s)) { used.add(s); result.push(s); }
-    }
-    if (result.length >= needed) return result.slice(0, needed);
-  }
-
-  // ② 정답 텍스트 자동 변형 (교묘한 오답)
-  const mutated = mutateText(correctText);
-  if (mutated && mutated !== correctText && !used.has(mutated)) {
-    used.add(mutated);
-    result.push(mutated);
-  }
-
-  // ② 정답의 다른 li 항목들을 변형
-  const allLis = getLiTexts(q.a);
-  for (const li of allLis.slice(1)) {
-    if (result.length >= needed) break;
-    const m = mutateText(li);
-    const candidate = m || li;
-    const s = shorten(candidate);
-    if (!used.has(s)) { used.add(s); result.push(s); }
-  }
-
-  // ③ 부족하면 같은 카테고리 문제의 첫 번째 li 사용
-  if (result.length < needed) {
-    const sameCat = QA.filter(x => x !== q && x.cat === q.cat).sort(() => Math.random()-.5);
-    for (const item of sameCat) {
-      if (result.length >= needed) break;
-      const lis = getLiTexts(item.a);
-      const raw = shorten(lis[0]);
-      if (!used.has(raw)) { used.add(raw); result.push(raw); }
-    }
-  }
-
-  // ④ 그래도 부족하면 전체에서 보충
-  if (result.length < needed) {
-    const others = QA.filter(x => x !== q && x.cat !== q.cat).sort(() => Math.random()-.5);
-    for (const item of others) {
-      if (result.length >= needed) break;
-      const lis = getLiTexts(item.a);
-      const raw = shorten(lis[0]);
-      if (!used.has(raw)) { used.add(raw); result.push(raw); }
-    }
-  }
-
-  return result.slice(0, needed);
-}
-// ─────────────────────────────────────────────────────
-
-function renderQuiz(){
-  const el = document.getElementById('quiz-content');
-  if(quizIdx >= quizData.length){
-    const pct = Math.round(quizScore/quizData.length*100);
-    el.innerHTML = `<div class="scorebox">
-      <span class="score-emoji">${pct>=80?'🏆':pct>=60?'😊':'📚'}</span>
-      <div class="scorenum">${quizScore} / ${quizData.length}점</div>
-      <div class="scoretext">${pct>=80?'훌륭해요! 합격권입니다!':pct>=60?'조금 더 복습하면 완벽해요!':'핵심 문제를 다시 공부해보세요!'}</div>
-      <div class="stat-grid">
-        <div class="stat"><div class="stat-n">${quizScore}</div><div class="stat-l">정답</div></div>
-        <div class="stat"><div class="stat-n">${quizData.length-quizScore}</div><div class="stat-l">오답</div></div>
-        <div class="stat"><div class="stat-n">${pct}%</div><div class="stat-l">정답률</div></div>
-      </div>
-      <button class="navbtn p" onclick="startQuiz()">다시 풀기 ↺</button></div>`;
-    return;
-  }
-
-  const q = quizData[quizIdx];
-
-  // 정답 텍스트 (첫 번째 li)
-  const allLis = getLiTexts(q.a);
-  const correctText = shorten(allLis[0]);
-
-  // 교묘한 오답 3개 생성
-  const wrongChoices = makeWrongChoices(q, correctText, 3);
-
-  // 4개 섞기
-  const choices = [
-    {text: correctText, correct: true},
-    ...wrongChoices.map(t => ({text: t, correct: false}))
-  ].sort(() => Math.random() - .5);
-
-  quizAnswered = false;
-  const pct = Math.round(quizIdx / quizData.length * 100);
-
-  el.innerHTML = `
-    <div class="qprog">${quizIdx+1} / ${quizData.length} &nbsp;${catBadge(q.cat)}
-      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
-    </div>
-    <div class="qbig">❓ ${q.q}</div>
-    <p style="font-size:12px;color:var(--text-sub);margin-bottom:12px">아래 보기 중 올바른 답을 고르세요</p>
-    <div class="choices">${choices.map((c,i) =>
-      `<button class="chbtn" onclick="checkQ(this,${c.correct})">${['①','②','③','④'][i]} ${c.text}</button>`
-    ).join('')}</div>
-    <div class="fb" id="qfb"></div>
-    <div id="qans" style="display:none;margin-top:4px;margin-bottom:12px;padding:12px;background:#FAFAFE;border-radius:10px;border-left:3px solid var(--purple);font-size:13px;line-height:1.8">${q.a}</div>
-    <button class="navbtn p" id="qnext" style="display:none" onclick="nextQ()">다음 문제 →</button>`;
-}
-
-function checkQ(btn, correct){
-  if(quizAnswered) return;
-  quizAnswered = true;
-  document.querySelectorAll('.chbtn').forEach(b => b.style.pointerEvents = 'none');
-  const fb  = document.getElementById('qfb');
-  const ans = document.getElementById('qans');
-  const nxt = document.getElementById('qnext');
-  const _qOrigIdx = QA_ORIG.indexOf(quizData[quizIdx]);
-  if(correct){
-    btn.classList.add('correct');
-    quizScore++;
-    if(_qOrigIdx>=0) saveProgress(_qOrigIdx, 5);
-    fb.innerHTML = '<span style="color:#1D9E75;font-weight:500">✓ 정답입니다!</span>';
-  } else {
-    btn.classList.add('wrong');
-    if(_qOrigIdx>=0) saveProgress(_qOrigIdx, 1);
-    fb.innerHTML = '<span style="color:#A32D2D;font-weight:500">✗ 틀렸습니다. 아래 정답을 확인하세요.</span>';
-    // 정답 버튼 초록으로 강조
-    document.querySelectorAll('.chbtn').forEach(b => {
-      if(b !== btn) b.classList.add('correct-hint');
-    });
-  }
-  ans.style.display = 'block';
-  nxt.style.display = 'inline-block';
-}
-
-function nextQ(){quizIdx++;renderQuiz();}
-function startOX(){
-  oxData=[...OX].sort(()=>Math.random()-.5);
-  oxIdx=0;oxScore=0;renderOX();
-}
-function renderOX(){
-  const el=document.getElementById('ox-content');
-  if(oxIdx>=oxData.length){
-    const pct=Math.round(oxScore/oxData.length*100);
-    el.innerHTML=`<div class="scorebox">
-      <span class="score-emoji">${pct>=90?'🏆':pct>=70?'😊':'📚'}</span>
-      <div class="scorenum">${oxScore} / ${oxData.length}점</div>
-      <div class="scoretext">${pct>=90?'완벽한 이해도입니다!':pct>=70?'잘 했어요! 틀린 문제만 복습하세요.':'OX 개념을 다시 확인해보세요.'}</div>
-      <button class="navbtn p" onclick="startOX()">다시 풀기 ↺</button></div>`;
-    return;
-  }
-  const q=oxData[oxIdx];
-  el.innerHTML=`
-    <div class="qprog">OX ${oxIdx+1} / ${oxData.length} &nbsp;·&nbsp; 현재 ${oxScore}점<div class="prog-bar"><div class="prog-fill" style="width:${Math.round(oxIdx/oxData.length*100)}%"></div></div></div>
-    <div class="ox-q">${q.q}</div>
-    <div class="ox-btns"><button class="oxbtn" onclick="checkOX(this,true)">⭕</button><button class="oxbtn" onclick="checkOX(this,false)">❌</button></div>
-    <div class="fb" id="oxfb"></div>
-    <div class="ox-exp" id="oxexp">💡 ${q.ex}</div>
-    <button class="navbtn p" onclick="nextOX()">다음 →</button>`;
-}
-function checkOX(btn,val){
-  const q=oxData[oxIdx];
-  document.querySelectorAll('.oxbtn').forEach(b=>b.style.pointerEvents='none');
-  document.getElementById('oxexp').classList.add('show');
-  const fb=document.getElementById('oxfb');
-  const oxOrigIdx = OX.indexOf(q);
-  if(val===q.a){
-    btn.classList.add('correct');oxScore++;
-    if(oxOrigIdx>=0) saveProgress('ox_'+oxOrigIdx, 5);
-    fb.innerHTML='<span style="color:#1D9E75">✓ 정답!</span>';
-  } else {
-    btn.classList.add('wrong');
-    if(oxOrigIdx>=0) saveProgress('ox_'+oxOrigIdx, 1);
-    fb.innerHTML=`<span style="color:#A32D2D">✗ 틀렸습니다. 정답: ${q.a?'⭕':'❌'}</span>`;
-  }
-}
-function nextOX(){oxIdx++;renderOX();}
-// 로그인 input 이벤트
-document.addEventListener('DOMContentLoaded', function(){
-  // 매번 문제 순서 랜덤 셔플 (로그인 후 sortByWeakness로 재정렬됨)
-  QA.sort(() => Math.random() - 0.5);
-
-  var ni = document.getElementById('login-name');
-  var pi = document.getElementById('login-pw');
-  if(ni){
-    ni.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
-    ni.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
-    ni.addEventListener('keydown', function(e){ if(e.key==='Enter') pi.focus(); });
-  }
-  if(pi){
-    pi.addEventListener('focus', function(){ this.style.borderColor='#534AB7'; });
-    pi.addEventListener('blur',  function(){ this.style.borderColor='#e8e6f0'; });
-    pi.addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
-  }
-});
-
-// ── 수강생 코드 ──────────────────────────
-const STUDENT_CODES = {
-  'kim-4493': '김진호',
-  'oh-4946':  '오혜진',
-  'yun-7007': '윤재원',
-  'jang-6656':'장미정',
-  'jang-6224':'장윤희',
-  'jang-7888':'장은정',
-  'jo-8925':  '조남석',
-  'jin-5569': '진광주',
-  'hong-2269':'홍승우',
-};
-const FB_URL = 'https://sports-quiz-60fae-default-rtdb.firebaseio.com';
-const QA_ORIG = [...QA]; // 원본 순서 보존 (취약 문제 정렬용)
-
-// ── Firebase 학습 기록 시스템 ──────────────────
-let currentStudent = null;  // 현재 로그인한 학생 코드
-let studentProgress = {};   // {문제인덱스: {score, tries, lastSeen}}
-
-// Firebase에서 학습 기록 불러오기
 const EXPERT_WRONG = [
   // ── 경기규정 ──
   {key:'스피드 경기에 대해',wrongs:['높이 10m, 기울기 90도의 인공벽에서 진행된다','완등한 높이를 기준으로 순위를 결정한다','자동계측시스템 없이 스톱워치로 시간을 측정한다']},
@@ -1095,7 +601,7 @@ const EXPERT_WRONG = [
   {key:'등산의 종류(방법)',wrongs:['등산은 오직 정상에 오르는 행위만을 의미하며 방법은 중요하지 않다','릿지등반과 계곡등반은 동일한 방식이다','등산은 계절에 관계없이 모두 동일한 방법으로 진행한다']},
   {key:'알피니즘',wrongs:['알피니즘은 알프스 산맥의 등산 기술만을 의미하며 다른 산에는 적용되지 않는다','현대 등산에서는 과거와 마찬가지로 정상 도달만이 가치를 가진다','알피니즘은 현재 사용되지 않는 구시대적 개념이다']},
   {key:'등산 지도에 있어서',wrongs:['등산 지도의 최우선 목적은 정상 정복 능력을 키우는 것이다','등산 지도에서 체력 향상이 안전보다 더 중요한 목적이다','등산 지도에서 공동체 의식 함양은 주요 목적이 아니다']},
-];
+,
   { key:'CPR(심폐소생술)',
     wrongs:[
       '먼저 기도를 열고 인공호흡 5회 실시 후 가슴 압박을 시작한다',
@@ -1278,156 +784,242 @@ const EXPERT_WRONG = [
     ]},
 ];
 
-function findExpertWrongs(q) {
-  for (const entry of EXPERT_WRONG) {
-    if (q.q.includes(entry.key)) return entry.wrongs;
-  }
-  return null;
-}
-// ──────────────────────────────────────────────────────
+function findEW(q){for(const e of EXPERT_WRONG){if(q.q.includes(e.key))return e.wrongs;}return null;}
 
+// ── 상태 ──
+let curCat='all', hideKnown=false, knownSet=new Set(), progress={};
+let curPw=null, curToken=null;
+let qData=[],qIdx=0,qScore=0,qAnswered=false;
+let oxData=[],oxIdx=0,oxScore=0;
+const QA_ORIG=[...QA];
 
-async function loadProgress(pw) {
-  const key = pw.replace(/-/g, '_');
-  try {
-    const res = await fetch(`${FB_URL}/progress/${key}.json`);
-    const data = await res.json();
-    if (data) studentProgress = data;
-    else studentProgress = {};
-  } catch(e) { studentProgress = {}; }
-}
+// ── 로그인 ──
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('inp-pw').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+document.getElementById('inp-name').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('inp-pw').focus(); });
 
-// Firebase에 학습 기록 저장
-function saveProgress(qIdx, score) {
-  if (!currentStudent) return;
-  const key = currentStudent.replace(/-/g, '_');
-  const prev = studentProgress[qIdx] || {score: 0, tries: 0};
-  studentProgress[qIdx] = {
-    score: Math.max(prev.score, score),
-    tries: (prev.tries || 0) + 1,
-    lastSeen: Date.now()
-  };
-  // Firebase에 해당 문제만 업데이트
-  fetch(`${FB_URL}/progress/${key}/${qIdx}.json`, {
-    method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(studentProgress[qIdx])
-  }).catch(() => {});
-}
-
-// 취약 문제 우선 정렬 (낮은 점수·많은 시도·오래된 문제 우선)
-function sortByWeakness() {
-  QA.sort((a, b) => {
-    const ai = QA_ORIG.indexOf(a);
-    const bi = QA_ORIG.indexOf(b);
-    const pa = studentProgress[ai];
-    const pb = studentProgress[bi];
-    // 한 번도 안 본 문제 최우선
-    if (!pa && pb) return -1;
-    if (pa && !pb) return 1;
-    if (!pa && !pb) return Math.random() - 0.5;
-    // 점수 낮은 것 우선
-    if (pa.score !== pb.score) return pa.score - pb.score;
-    // 시도 횟수 많은 것 우선 (자주 틀린 것)
-    return (pb.tries||0) - (pa.tries||0);
-  });
-}
-
-// QA 원본 순서 저장 (인덱스 기준으로 사용)
-// ────────────────────────────────────────────────
-
-// ─────────────────────────────────────────
-
-function tryLogin(){
-  const name = document.getElementById('login-name').value.trim();
-  const pw   = document.getElementById('login-pw').value.trim();
+function doLogin(){
+  const name = document.getElementById('inp-name').value.trim();
+  const pw   = document.getElementById('inp-pw').value.trim();
   const err  = document.getElementById('login-err');
-  const btn  = document.querySelector('#login-screen button');
+  const btn  = document.getElementById('login-btn');
 
   if(!name){ err.textContent='이름을 입력해 주세요.'; return; }
   if(!pw)  { err.textContent='비밀번호를 입력해 주세요.'; return; }
-
-  if(!STUDENT_CODES[pw]){
-    err.textContent='비밀번호가 올바르지 않습니다.';
-    document.getElementById('login-pw').value='';
-    return;
-  }
-
-  if(STUDENT_CODES[pw] !== name){
-    err.textContent='이름이 코드와 일치하지 않습니다.';
-    return;
-  }
+  if(!CODES[pw]){ err.textContent='비밀번호가 올바르지 않습니다.'; document.getElementById('inp-pw').value=''; return; }
+  if(CODES[pw]!==name){ err.textContent='이름이 코드와 일치하지 않습니다.'; return; }
 
   btn.textContent='확인 중...';
-  btn.disabled = true;
+  btn.disabled=true;
   err.textContent='';
 
-  const now    = new Date();
-  const time   = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
-  const device = /iPad|iPhone|iPod/.test(navigator.userAgent)?'iPhone':/Android/.test(navigator.userAgent)?'Android':'PC';
-  const sessionKey = pw.replace(/-/g,'_');
-  const token  = Math.random().toString(36).slice(2)+Date.now().toString(36);
+  const now=new Date();
+  const time=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+  const device=/iPad|iPhone|iPod/.test(navigator.userAgent)?'iPhone':/Android/.test(navigator.userAgent)?'Android':'PC';
+  const sk=pw.replace(/-/g,'_');
+  const token=Math.random().toString(36).slice(2)+Date.now().toString(36);
 
-  fetch(FB_URL+'/sessions/'+sessionKey+'.json')
+  fetch(FB+'/sessions/'+sk+'.json')
     .then(r=>r.json())
-    .then(existing=>{
-      if(existing && existing.token){
-        const elapsed = Date.now()-(existing.lastBeat||0);
-        if(elapsed < 5*60*1000){
-          err.textContent='⚠️ 이미 다른 기기('+existing.device+')에서 접속 중입니다. 해당 기기를 종료 후 다시 시도하세요.';
-          btn.textContent='입장하기';
-          btn.disabled=false;
+    .then(ex=>{
+      if(ex&&ex.token){
+        const elapsed=Date.now()-(ex.lastBeat||0);
+        if(elapsed<5*60*1000){
+          err.textContent='⚠️ 이미 다른 기기('+ex.device+')에서 접속 중입니다.';
+          btn.textContent='입장하기'; btn.disabled=false;
           return Promise.reject('block');
         }
       }
-      return fetch(FB_URL+'/sessions/'+sessionKey+'.json',{
-        method:'PUT',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({name,token,time,device,lastBeat:Date.now()})
-      });
+      return fetch(FB+'/sessions/'+sk+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,token,time,device,lastBeat:Date.now()})});
     })
-    .then(res=>{
-      if(!res) return;
-      fetch(FB_URL+'/logs.json',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({name,time,device})
-      }).catch(()=>{});
-
-      currentStudent = pw;
-
+    .then(()=>{
+      fetch(FB+'/logs.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,time,device})}).catch(()=>{});
+      curPw=sk; curToken=token;
+      // 하트비트
       setInterval(()=>{
-        fetch(FB_URL+'/sessions/'+sessionKey+'.json')
-          .then(r=>r.json())
-          .then(cur=>{
-            if(!cur||cur.token!==token){ alert('⚠️ 관리자에 의해 접속이 종료되었습니다.'); location.reload(); return; }
-            fetch(FB_URL+'/sessions/'+sessionKey+'/lastBeat.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:Date.now().toString()}).catch(()=>{});
-          }).catch(()=>{});
+        fetch(FB+'/sessions/'+sk+'.json').then(r=>r.json()).then(cur=>{
+          if(!cur||cur.token!==curToken){alert('⚠️ 관리자에 의해 접속이 종료되었습니다.');location.reload();}
+          else fetch(FB+'/sessions/'+sk+'/lastBeat.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:Date.now().toString()}).catch(()=>{});
+        }).catch(()=>{});
       },30000);
-
-      window.addEventListener('beforeunload',()=>{
-        navigator.sendBeacon(FB_URL+'/sessions/'+sessionKey+'.json',JSON.stringify(null));
-      });
-
-      loadProgress(pw).then(()=>{
-        sortByWeakness();
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('main-content').style.display='block';
-        renderQBank('all');
-      });
+      window.addEventListener('beforeunload',()=>navigator.sendBeacon(FB+'/sessions/'+sk+'.json',JSON.stringify(null)));
+      // 학습 기록 로드 후 입장
+      fetch(FB+'/progress/'+sk+'.json').then(r=>r.json()).then(d=>{if(d)progress=d;}).catch(()=>{}).finally(()=>enterApp());
     })
     .catch(e=>{
       if(e==='block') return;
-      currentStudent = pw;
-      loadProgress(pw).then(()=>{
-        sortByWeakness();
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('main-content').style.display='block';
-        renderQBank('all');
-      });
+      // Firebase 오류 시 바로 입장
+      curPw=sk; curToken=token;
+      enterApp();
     });
 }
-</script>
 
+function pad(n){return String(n).padStart(2,'0');}
+
+function enterApp(){
+  QA.sort((a,b)=>{
+    const ai=QA_ORIG.indexOf(a), bi=QA_ORIG.indexOf(b);
+    const pa=progress[ai], pb=progress[bi];
+    if(!pa&&pb) return -1; if(pa&&!pb) return 1; if(!pa&&!pb) return Math.random()-.5;
+    if(pa.score!==pb.score) return pa.score-pb.score;
+    return (pb.tries||0)-(pa.tries||0);
+  });
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-content').style.display='block';
+  renderQBank('all');
+}
+
+function saveP(idx,score){
+  if(!curPw) return;
+  const prev=progress[idx]||{score:0,tries:0};
+  progress[idx]={score:Math.max(prev.score,score),tries:(prev.tries||0)+1,lastSeen:Date.now()};
+  fetch(FB+'/progress/'+curPw+'/'+idx+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(progress[idx])}).catch(()=>{});
+}
+
+// ── 문제은행 ──
+function badge(cat){return '<span class="badge '+BDGE[cat]+'">'+CAT[cat]+'</span>';}
+
+function renderQBank(cat){
+  curCat=cat;
+  const list=cat==='all'?QA:QA.filter(q=>q.cat===cat);
+  const total=list.length;
+  const knownN=[...knownSet].filter(i=>cat==='all'||QA[i]&&QA[i].cat===cat).length;
+  const pct=total>0?Math.round(knownN/total*100):0;
+  document.getElementById('know-stat').textContent='학습 진도: '+knownN+' / '+total+' ('+pct+'%)';
+  document.getElementById('know-fill').style.width=pct+'%';
+  const vis=total-(hideKnown?knownN:0);
+  document.getElementById('qcount').textContent=vis+'문제 표시 (전체 '+total+'문제)';
+  document.getElementById('qlist').innerHTML=list.map((item,i)=>{
+    const gi=QA_ORIG.indexOf(item);
+    const isK=knownSet.has(gi);
+    return '<div class="qcard'+(isK?' known-card':'')+'" id="qc'+gi+'" style="'+(isK&&hideKnown?'display:none':'')+'">'+
+      '<div class="qhead"><span class="qnum">Q'+(i+1)+'</span><div class="qtxt">'+item.q+'</div></div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">'+
+      badge(item.cat)+
+      '<button class="kbtn'+(isK?' known':'')+'" onclick="toggleKnown('+gi+',this)">'+(isK?'✅ 알고 있음':'✅ 알고 있어요')+'</button>'+
+      '</div>'+
+      '<button class="abtn" onclick="toggleAns(this)">▶ 정답 보기</button>'+
+      '<div class="answer">'+item.a+'</div>'+
+      '</div>';
+  }).join('');
+}
+
+function toggleAns(btn){const a=btn.nextElementSibling;a.classList.toggle('show');btn.textContent=a.classList.contains('show')?'▼ 닫기':'▶ 정답 보기';}
+
+function filterQ(btn,cat){document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderQBank(cat);}
+
+function toggleKnown(gi,btn){
+  if(knownSet.has(gi)){knownSet.delete(gi);btn.textContent='✅ 알고 있어요';btn.classList.remove('known');const c=document.getElementById('qc'+gi);if(c){c.classList.remove('known-card');c.style.display='';}}
+  else{knownSet.add(gi);btn.textContent='✅ 알고 있음!';btn.classList.add('known');const c=document.getElementById('qc'+gi);if(c){c.classList.add('known-card');if(hideKnown)c.style.display='none';}}
+  try{localStorage.setItem('knownQ',JSON.stringify([...knownSet]));}catch(e){}
+  renderQBank(curCat);
+}
+
+function toggleHide(btn){
+  hideKnown=!hideKnown;
+  btn.classList.toggle('on',hideKnown);
+  btn.textContent=hideKnown?'👁 전체 보기':'✅ 아는 문제 숨기기';
+  document.querySelectorAll('.qcard').forEach(c=>{if(c.classList.contains('known-card'))c.style.display=hideKnown?'none':'';});
+  renderQBank(curCat);
+}
+
+function resetKnown(){if(!confirm('학습 진도를 초기화할까요?'))return;knownSet.clear();try{localStorage.removeItem('knownQ');}catch(e){}renderQBank(curCat);}
+
+// ── 퀴즈 ──
+function shorten(t){return t.length>75?t.slice(0,73)+'…':t;}
+function getLi(html){const d=document.createElement('div');d.innerHTML=html;const l=[...d.querySelectorAll('li')];return l.length?l.map(x=>x.textContent.replace(/\s+/g,' ').trim()):[ d.textContent.replace(/\s+/g,' ').trim()];}
+
+function startQuiz(){
+  const cat=document.getElementById('qcat').value;
+  const num=parseInt(document.getElementById('qnum').value);
+  const skip=document.getElementById('skip-known').checked;
+  let pool=cat==='all'?[...QA]:QA.filter(q=>q.cat===cat);
+  if(skip) pool=pool.filter(item=>!knownSet.has(QA_ORIG.indexOf(item)));
+  if(pool.length===0){document.getElementById('quiz-wrap').innerHTML='<div style="text-align:center;padding:2rem;color:var(--ts)">모든 문제를 알고 있어요! 초기화 후 다시 도전하세요.</div>';return;}
+  qData=pool.sort(()=>Math.random()-.5).slice(0,Math.min(num,pool.length));
+  qIdx=0;qScore=0;renderQ();
+}
+
+function renderQ(){
+  const el=document.getElementById('quiz-wrap');
+  if(qIdx>=qData.length){
+    const pct=Math.round(qScore/qData.length*100);
+    el.innerHTML='<div class="scorebox"><div style="font-size:48px">'+(pct>=80?'🏆':pct>=60?'😊':'📚')+'</div><div class="scorenum">'+qScore+' / '+qData.length+'점</div><div class="scoretxt">'+(pct>=80?'훌륭해요! 합격권입니다!':pct>=60?'조금 더 복습하면 완벽해요!':'핵심 문제를 다시 공부해보세요!')+'</div><div class="statgrid"><div class="stat"><div class="statn">'+qScore+'</div><div class="statl">정답</div></div><div class="stat"><div class="statn">'+(qData.length-qScore)+'</div><div class="statl">오답</div></div><div class="stat"><div class="statn">'+pct+'%</div><div class="statl">정답률</div></div></div><button class="navbtn p" onclick="startQuiz()">다시 풀기 ↺</button></div>';
+    return;
+  }
+  const q=qData[qIdx];
+  const lis=getLi(q.a);
+  const ct=shorten(lis[0]);
+  const used=new Set([ct]);
+  const wrongs=[];
+  const ew=findEW(q);
+  if(ew){for(const w of ew.sort(()=>Math.random()-.5)){if(wrongs.length>=3)break;const s=shorten(w);if(!used.has(s)){used.add(s);wrongs.push(s);}}}
+  if(wrongs.length<3){
+    const pool2=[...QA.filter(x=>x!==q&&x.cat===q.cat).sort(()=>Math.random()-.5),...QA.filter(x=>x!==q&&x.cat!==q.cat).sort(()=>Math.random()-.5)];
+    for(const item of pool2){if(wrongs.length>=3)break;const s=shorten(getLi(item.a)[0]);if(!used.has(s)){used.add(s);wrongs.push(s);}}
+  }
+  const choices=[{t:ct,ok:true},...wrongs.map(w=>({t:w,ok:false}))].sort(()=>Math.random()-.5);
+  qAnswered=false;
+  const pct=Math.round(qIdx/qData.length*100);
+  el.innerHTML='<div class="qprog">'+( qIdx+1)+' / '+qData.length+' &nbsp;'+badge(q.cat)+'<div class="progbar"><div class="progfill" style="width:'+pct+'%"></div></div></div>'+
+    '<div class="qbig">❓ '+q.q+'</div>'+
+    '<p style="font-size:12px;color:var(--ts);margin-bottom:12px">아래 보기 중 올바른 답을 고르세요</p>'+
+    '<div class="choices">'+choices.map((c,i)=>'<button class="chbtn" onclick="checkQ(this,'+c.ok+')">'+['①','②','③','④'][i]+' '+c.t+'</button>').join('')+'</div>'+
+    '<div class="fb" id="qfb"></div>'+
+    '<div class="qans" id="qans">'+q.a+'</div>'+
+    '<button class="navbtn p" id="qnext" style="display:none" onclick="nextQ()">다음 문제 →</button>';
+}
+
+function checkQ(btn,correct){
+  if(qAnswered)return; qAnswered=true;
+  document.querySelectorAll('.chbtn').forEach(b=>b.style.pointerEvents='none');
+  const gi=QA_ORIG.indexOf(qData[qIdx]);
+  if(correct){btn.classList.add('correct');qScore++;saveP(gi,5);document.getElementById('qfb').innerHTML='<span style="color:#1D9E75;font-weight:500">✓ 정답입니다!</span>';}
+  else{btn.classList.add('wrong');saveP(gi,1);document.getElementById('qfb').innerHTML='<span style="color:#A32D2D;font-weight:500">✗ 틀렸습니다. 아래 정답을 확인하세요.</span>';}
+  document.getElementById('qans').style.display='block';
+  document.getElementById('qnext').style.display='inline-block';
+}
+function nextQ(){qIdx++;renderQ();}
+
+// ── OX ──
+function startOX(){oxData=[...OX].sort(()=>Math.random()-.5);oxIdx=0;oxScore=0;renderOX();}
+function renderOX(){
+  const el=document.getElementById('ox-wrap');
+  if(oxIdx>=oxData.length){
+    const pct=Math.round(oxScore/oxData.length*100);
+    el.innerHTML='<div class="scorebox"><div style="font-size:48px">'+(pct>=90?'🏆':pct>=70?'😊':'📚')+'</div><div class="scorenum">'+oxScore+' / '+oxData.length+'점</div><div class="scoretxt">'+(pct>=90?'완벽!':pct>=70?'잘 했어요!':'다시 복습하세요.')+'</div><button class="navbtn p" onclick="startOX()">다시 풀기 ↺</button></div>';
+    return;
+  }
+  const q=oxData[oxIdx];
+  const pct=Math.round(oxIdx/oxData.length*100);
+  el.innerHTML='<div class="qprog">OX '+(oxIdx+1)+' / '+oxData.length+' · 현재 '+oxScore+'점<div class="progbar"><div class="progfill" style="width:'+pct+'%"></div></div></div>'+
+    '<div class="oxq">'+q.q+'</div>'+
+    '<div class="oxbtns"><button class="oxbtn" onclick="checkOX(this,true)">⭕</button><button class="oxbtn" onclick="checkOX(this,false)">❌</button></div>'+
+    '<div class="fb" id="oxfb"></div>'+
+    '<div class="oxexp" id="oxexp">💡 '+q.ex+'</div>'+
+    '<button class="navbtn p" onclick="nextOX()">다음 →</button>';
+}
+function checkOX(btn,val){
+  const q=oxData[oxIdx];
+  document.querySelectorAll('.oxbtn').forEach(b=>b.style.pointerEvents='none');
+  document.getElementById('oxexp').classList.add('show');
+  const gi=OX.indexOf(q);
+  if(val===q.a){btn.classList.add('correct');oxScore++;saveP('ox_'+gi,5);document.getElementById('oxfb').innerHTML='<span style="color:#1D9E75">✓ 정답!</span>';}
+  else{btn.classList.add('wrong');saveP('ox_'+gi,1);document.getElementById('oxfb').innerHTML='<span style="color:#A32D2D">✗ 틀렸습니다. 정답: '+(q.a?'⭕':'❌')+'</span>';}
+}
+function nextOX(){oxIdx++;renderOX();}
+
+// ── 탭 ──
+function showTab(id,el){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('vis'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById(id).classList.add('vis');
+  el.classList.add('on');
+  if(id==='ox'&&oxData.length===0) startOX();
+}
+
+// ── 초기화 ──
+try{const k=localStorage.getItem('knownQ');if(k)knownSet=new Set(JSON.parse(k));}catch(e){}
+</script>
 </body>
 </html>
