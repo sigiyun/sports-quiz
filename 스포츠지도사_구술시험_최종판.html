@@ -230,7 +230,7 @@ function doLogin(){
     .then(ex=>{
       if(ex&&ex.token){
         const elapsed=Date.now()-(ex.lastBeat||0);
-        if(elapsed<5*60*1000){
+        if(elapsed<30*1000){
           err.textContent='⚠️ 이미 다른 기기('+ex.device+')에서 접속 중입니다.';
           btn.textContent='입장하기'; btn.disabled=false;
           return Promise.reject('block');
