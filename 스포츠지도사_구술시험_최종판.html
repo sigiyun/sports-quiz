@@ -1,431 +1,1047 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🧗 스포츠지도사 구술시험 최종판</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-:root{--p:#534AB7;--pl:#EEEDFE;--pd:#2D2870;--t:#1D9E75;--tl:#E1F5EE;--a:#BA7517;--al:#FAEEDA;--r:#A32D2D;--rl:#FCEBEB;--bg:#F8F7FF;--s:#fff;--tx:#1a1a2e;--ts:#6b6b8a;--bd:#e8e6f0}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
-/* 로그인 */
-#login-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#2D2870,#534AB7 55%,#7F77DD);display:flex;align-items:center;justify-content:center;padding:1.5rem}
-.login-box{background:#fff;border-radius:20px;padding:2rem 1.75rem;width:100%;max-width:360px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.25)}
-.login-box h2{font-size:18px;font-weight:700;color:#1a1a2e;margin:.5rem 0 .25rem}
-.login-box p{font-size:13px;color:#6b6b8a;margin-bottom:1.5rem}
-.login-label{font-size:12px;font-weight:500;color:#6b6b8a;display:block;margin-bottom:5px;text-align:left}
-.login-input{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8e6f0;font-size:14px;font-family:inherit;outline:none;margin-bottom:12px;box-sizing:border-box}
-.login-input:focus{border-color:#534AB7}
-#login-err{font-size:12px;color:#A32D2D;min-height:18px;margin-bottom:10px;text-align:left;display:block}
-#login-btn{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#534AB7,#7F77DD);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
-.login-note{font-size:11px;color:#a0a0b8;margin-top:1rem}
-/* 메인 */
-#main-content{display:none}
-.hero{background:linear-gradient(135deg,#2D2870,#534AB7 55%,#7F77DD);padding:1.75rem 1.25rem;color:#fff}
-.hero h1{font-size:19px;font-weight:700;margin-bottom:4px}
-.hero p{font-size:12px;opacity:.75}
-.tab-wrap{background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(83,74,183,.06)}
-.tabs{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 1rem}
-.tabs::-webkit-scrollbar{display:none}
-.tab{padding:.75rem 1rem;font-size:13px;font-weight:500;color:var(--ts);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;flex-shrink:0;transition:all .2s}
-.tab.on{color:var(--p);border-bottom-color:var(--p)}
-.content{padding:1rem;max-width:680px;margin:0 auto;padding-bottom:5rem}
-.sec{display:none}.sec.vis{display:block}
-/* 필터 */
-.filter-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:1rem}
-.filter-scroll::-webkit-scrollbar{display:none}
-.fbtn{padding:5px 12px;border-radius:20px;border:1px solid var(--bd);font-size:12px;cursor:pointer;background:#fff;color:var(--ts);white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
-.fbtn.on{background:var(--p);color:#fff;border-color:var(--p);font-weight:500}
-/* 카드 */
-.qcard{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:1rem 1.1rem;margin-bottom:10px;box-shadow:0 2px 8px rgba(83,74,183,.06)}
-.qhead{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
-.qnum{font-size:11px;font-weight:700;color:var(--p);background:var(--pl);padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:2px}
-.qtxt{font-size:14px;font-weight:500;line-height:1.55;flex:1}
-.badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
-.bc{background:var(--pl);color:#3C3489}.bh{background:var(--tl);color:#085041}
-.br{background:var(--al);color:#633806}.bs{background:var(--rl);color:#791F1F}
-.bn{background:#E6F1FB;color:#0C447C}.bt{background:#EAF3DE;color:#27500A}
-.bg2{background:#EAF3DE;color:#27500A}
-.abtn{padding:7px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ts);font-size:12px;cursor:pointer;width:100%;text-align:left;font-family:inherit;transition:background .15s;margin-top:8px}
-.abtn:hover{background:var(--pl);color:var(--p)}
-.answer{margin-top:10px;padding:12px;background:#FAFAFE;border-radius:10px;border-left:3px solid var(--p);font-size:13px;line-height:1.8;display:none}
-.answer.show{display:block}
-.answer ul{padding-left:1.1rem}.answer li{margin-bottom:4px}.answer b{color:var(--p)}
-/* 진행 바 */
-.knowbar{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
-.knowstat{font-size:12px;color:var(--ts)}
-.knowprog{flex:1;height:6px;background:var(--bd);border-radius:3px;overflow:hidden;min-width:80px}
-.knowfill{height:100%;background:var(--t);border-radius:3px;transition:width .4s}
-.knowbtn{padding:5px 14px;border-radius:20px;border:1px solid var(--bd);font-size:12px;cursor:pointer;background:#fff;color:var(--ts);font-family:inherit}
-.knowbtn.on{background:var(--p);color:#fff;border-color:var(--p);font-weight:500}
-.kbtn{padding:4px 10px;border-radius:16px;border:1px solid var(--bd);font-size:11px;cursor:pointer;background:#fff;color:var(--ts);font-family:inherit;transition:all .15s}
-.kbtn.known{background:var(--tl);color:#085041;border-color:var(--t);font-weight:500}
-.qcard.known-card{opacity:.3}
-/* 퀴즈 */
-.qprog{font-size:12px;color:var(--ts);margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
-.progbar{flex:1;height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
-.progfill{height:100%;background:var(--p);border-radius:2px;transition:width .3s}
-.qbig{font-size:15px;font-weight:500;padding:1rem;background:var(--pl);border-radius:14px;border-left:4px solid var(--p);margin-bottom:1.25rem;line-height:1.6}
-.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
-.chbtn{padding:11px 14px;border-radius:10px;border:1px solid var(--bd);background:#fff;color:var(--tx);font-size:13px;cursor:pointer;text-align:left;font-family:inherit;line-height:1.45;transition:all .15s}
-.chbtn:hover{border-color:var(--p);background:var(--pl)}
-.chbtn.correct{background:var(--tl);border-color:var(--t);color:#085041}
-.chbtn.wrong{background:var(--rl);border-color:var(--r);color:#791F1F}
-.fb{font-size:13px;font-weight:500;min-height:20px;margin-bottom:10px}
-.navbtn{padding:10px 20px;border-radius:10px;border:1px solid var(--bd);background:#fff;font-size:13px;cursor:pointer;font-family:inherit;font-weight:500}
-.navbtn.p{background:var(--p);color:#fff;border-color:var(--p)}
-/* 결과 */
-.scorebox{text-align:center;padding:2rem 1rem}
-.scorenum{font-size:36px;font-weight:700;color:var(--p);margin-bottom:6px}
-.scoretxt{font-size:13px;color:var(--ts);margin-bottom:1.5rem}
-.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.5rem}
-.stat{background:var(--bg);border-radius:10px;padding:.75rem;text-align:center;border:1px solid var(--bd)}
-.statn{font-size:22px;font-weight:700}.statl{font-size:11px;color:var(--ts);margin-top:2px}
-/* OX */
-.oxq{font-size:15px;font-weight:500;padding:1.25rem;background:var(--pl);border-radius:14px;border-left:4px solid var(--p);margin-bottom:1.25rem;line-height:1.6}
-.oxbtns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
-.oxbtn{padding:1.5rem 1rem;border-radius:14px;border:1.5px solid var(--bd);background:#fff;font-size:40px;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
-.oxbtn.correct{background:var(--tl);border-color:var(--t)}
-.oxbtn.wrong{background:var(--rl);border-color:var(--r)}
-.oxexp{font-size:13px;color:var(--ts);padding:10px 12px;background:#fff;border-radius:8px;border:1px solid var(--bd);margin-bottom:10px;display:none}
-.oxexp.show{display:block}
-/* 퀴즈 설정 */
-.quiz-ctrl{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
-.quiz-ctrl span{font-size:12px;color:var(--ts)}
-.quiz-ctrl select{padding:6px 10px;border-radius:8px;border:1px solid var(--bd);background:#fff;color:var(--tx);font-size:12px;font-family:inherit}
-.quiz-ctrl label{font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--ts)}
-.startbtn{padding:7px 16px;border-radius:8px;background:var(--p);color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
-.qans{display:none;margin-top:4px;margin-bottom:12px;padding:12px;background:#FAFAFE;border-radius:10px;border-left:3px solid var(--p);font-size:13px;line-height:1.8}
-.qans ul{padding-left:1.1rem}.qans li{margin-bottom:4px}.qans b{color:var(--p)}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧗 스포츠지도사 구술시험 최종판</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+    :root {
+      --p: #534AB7;
+      --pl: #EEEDFE;
+      --pd: #2D2870;
+      --t: #1D9E75;
+      --tl: #E1F5EE;
+      --a: #BA7517;
+      --al: #FAEEDA;
+      --r: #A32D2D;
+      --rl: #FCEBEB;
+      --bg: #F8F7FF;
+      --s: #fff;
+      --tx: #1a1a2e;
+      --ts: #6b6b8a;
+      --bd: #e8e6f0
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      min-height: 100vh
+    }
+
+    /* 로그인 */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: linear-gradient(135deg, #2D2870, #534AB7 55%, #7F77DD);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem
+    }
+
+    .login-box {
+      background: #fff;
+      border-radius: 20px;
+      padding: 2rem 1.75rem;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, .25)
+    }
+
+    .login-box h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: .5rem 0 .25rem
+    }
+
+    .login-box p {
+      font-size: 13px;
+      color: #6b6b8a;
+      margin-bottom: 1.5rem
+    }
+
+    .login-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #6b6b8a;
+      display: block;
+      margin-bottom: 5px;
+      text-align: left
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1.5px solid #e8e6f0;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 12px;
+      box-sizing: border-box
+    }
+
+    .login-input:focus {
+      border-color: #534AB7
+    }
+
+    #login-err {
+      font-size: 12px;
+      color: #A32D2D;
+      min-height: 18px;
+      margin-bottom: 10px;
+      text-align: left;
+      display: block
+    }
+
+    #login-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #534AB7, #7F77DD);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit
+    }
+
+    .login-note {
+      font-size: 11px;
+      color: #a0a0b8;
+      margin-top: 1rem
+    }
+
+    /* 메인 */
+    #main-content {
+      display: none
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #2D2870, #534AB7 55%, #7F77DD);
+      padding: 1.75rem 1.25rem;
+      color: #fff
+    }
+
+    .hero h1 {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 4px
+    }
+
+    .hero p {
+      font-size: 12px;
+      opacity: .75
+    }
+
+    .tab-wrap {
+      background: #fff;
+      border-bottom: 1px solid var(--bd);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(83, 74, 183, .06)
+    }
+
+    .tabs {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 0 1rem
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none
+    }
+
+    .tab {
+      padding: .75rem 1rem;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ts);
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all .2s
+    }
+
+    .tab.on {
+      color: var(--p);
+      border-bottom-color: var(--p)
+    }
+
+    .content {
+      padding: 1rem;
+      max-width: 680px;
+      margin: 0 auto;
+      padding-bottom: 5rem
+    }
+
+    .sec {
+      display: none
+    }
+
+    .sec.vis {
+      display: block
+    }
+
+    /* 필터 */
+    .filter-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+      margin-bottom: 1rem
+    }
+
+    .filter-scroll::-webkit-scrollbar {
+      display: none
+    }
+
+    .fbtn {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--bd);
+      font-size: 12px;
+      cursor: pointer;
+      background: #fff;
+      color: var(--ts);
+      white-space: nowrap;
+      font-family: inherit;
+      transition: all .15s;
+      flex-shrink: 0
+    }
+
+    .fbtn.on {
+      background: var(--p);
+      color: #fff;
+      border-color: var(--p);
+      font-weight: 500
+    }
+
+    /* 카드 */
+    .qcard {
+      background: #fff;
+      border: 1px solid var(--bd);
+      border-radius: 14px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(83, 74, 183, .06)
+    }
+
+    .qhead {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px
+    }
+
+    .qnum {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p);
+      background: var(--pl);
+      padding: 2px 7px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      margin-top: 2px
+    }
+
+    .qtxt {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.55;
+      flex: 1
+    }
+
+    .badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 500
+    }
+
+    .bc {
+      background: var(--pl);
+      color: #3C3489
+    }
+
+    .bh {
+      background: var(--tl);
+      color: #085041
+    }
+
+    .br {
+      background: var(--al);
+      color: #633806
+    }
+
+    .bs {
+      background: var(--rl);
+      color: #791F1F
+    }
+
+    .bn {
+      background: #E6F1FB;
+      color: #0C447C
+    }
+
+    .bt {
+      background: #EAF3DE;
+      color: #27500A
+    }
+
+    .bg2 {
+      background: #EAF3DE;
+      color: #27500A
+    }
+
+    .abtn {
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--bd);
+      background: var(--bg);
+      color: var(--ts);
+      font-size: 12px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      transition: background .15s;
+      margin-top: 8px
+    }
+
+    .abtn:hover {
+      background: var(--pl);
+      color: var(--p)
+    }
+
+    .answer {
+      margin-top: 10px;
+      padding: 12px;
+      background: #FAFAFE;
+      border-radius: 10px;
+      border-left: 3px solid var(--p);
+      font-size: 13px;
+      line-height: 1.8;
+      display: none
+    }
+
+    .answer.show {
+      display: block
+    }
+
+    .answer ul {
+      padding-left: 1.1rem
+    }
+
+    .answer li {
+      margin-bottom: 4px
+    }
+
+    .answer b {
+      color: var(--p)
+    }
+
+    /* 진행 바 */
+    .knowbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: .75rem;
+      flex-wrap: wrap
+    }
+
+    .knowstat {
+      font-size: 12px;
+      color: var(--ts)
+    }
+
+    .knowprog {
+      flex: 1;
+      height: 6px;
+      background: var(--bd);
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 80px
+    }
+
+    .knowfill {
+      height: 100%;
+      background: var(--t);
+      border-radius: 3px;
+      transition: width .4s
+    }
+
+    .knowbtn {
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--bd);
+      font-size: 12px;
+      cursor: pointer;
+      background: #fff;
+      color: var(--ts);
+      font-family: inherit
+    }
+
+    .knowbtn.on {
+      background: var(--p);
+      color: #fff;
+      border-color: var(--p);
+      font-weight: 500
+    }
+
+    .kbtn {
+      padding: 4px 10px;
+      border-radius: 16px;
+      border: 1px solid var(--bd);
+      font-size: 11px;
+      cursor: pointer;
+      background: #fff;
+      color: var(--ts);
+      font-family: inherit;
+      transition: all .15s
+    }
+
+    .kbtn.known {
+      background: var(--tl);
+      color: #085041;
+      border-color: var(--t);
+      font-weight: 500
+    }
+
+    .qcard.known-card {
+      opacity: .3
+    }
+
+    /* 퀴즈 */
+    .qprog {
+      font-size: 12px;
+      color: var(--ts);
+      margin-bottom: .75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .progbar {
+      flex: 1;
+      height: 4px;
+      background: var(--bd);
+      border-radius: 2px;
+      overflow: hidden
+    }
+
+    .progfill {
+      height: 100%;
+      background: var(--p);
+      border-radius: 2px;
+      transition: width .3s
+    }
+
+    .qbig {
+      font-size: 15px;
+      font-weight: 500;
+      padding: 1rem;
+      background: var(--pl);
+      border-radius: 14px;
+      border-left: 4px solid var(--p);
+      margin-bottom: 1.25rem;
+      line-height: 1.6
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 1rem
+    }
+
+    .chbtn {
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--bd);
+      background: #fff;
+      color: var(--tx);
+      font-size: 13px;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      line-height: 1.45;
+      transition: all .15s
+    }
+
+    .chbtn:hover {
+      border-color: var(--p);
+      background: var(--pl)
+    }
+
+    .chbtn.correct {
+      background: var(--tl);
+      border-color: var(--t);
+      color: #085041
+    }
+
+    .chbtn.wrong {
+      background: var(--rl);
+      border-color: var(--r);
+      color: #791F1F
+    }
+
+    .fb {
+      font-size: 13px;
+      font-weight: 500;
+      min-height: 20px;
+      margin-bottom: 10px
+    }
+
+    .navbtn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--bd);
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500
+    }
+
+    .navbtn.p {
+      background: var(--p);
+      color: #fff;
+      border-color: var(--p)
+    }
+
+    /* 결과 */
+    .scorebox {
+      text-align: center;
+      padding: 2rem 1rem
+    }
+
+    .scorenum {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--p);
+      margin-bottom: 6px
+    }
+
+    .scoretxt {
+      font-size: 13px;
+      color: var(--ts);
+      margin-bottom: 1.5rem
+    }
+
+    .statgrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 1.5rem
+    }
+
+    .stat {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: .75rem;
+      text-align: center;
+      border: 1px solid var(--bd)
+    }
+
+    .statn {
+      font-size: 22px;
+      font-weight: 700
+    }
+
+    .statl {
+      font-size: 11px;
+      color: var(--ts);
+      margin-top: 2px
+    }
+
+    /* OX */
+    .oxq {
+      font-size: 15px;
+      font-weight: 500;
+      padding: 1.25rem;
+      background: var(--pl);
+      border-radius: 14px;
+      border-left: 4px solid var(--p);
+      margin-bottom: 1.25rem;
+      line-height: 1.6
+    }
+
+    .oxbtns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 1rem
+    }
+
+    .oxbtn {
+      padding: 1.5rem 1rem;
+      border-radius: 14px;
+      border: 1.5px solid var(--bd);
+      background: #fff;
+      font-size: 40px;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+      font-family: inherit
+    }
+
+    .oxbtn.correct {
+      background: var(--tl);
+      border-color: var(--t)
+    }
+
+    .oxbtn.wrong {
+      background: var(--rl);
+      border-color: var(--r)
+    }
+
+    .oxexp {
+      font-size: 13px;
+      color: var(--ts);
+      padding: 10px 12px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--bd);
+      margin-bottom: 10px;
+      display: none
+    }
+
+    .oxexp.show {
+      display: block
+    }
+
+    /* 퀴즈 설정 */
+    .quiz-ctrl {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .quiz-ctrl span {
+      font-size: 12px;
+      color: var(--ts)
+    }
+
+    .quiz-ctrl select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--bd);
+      background: #fff;
+      color: var(--tx);
+      font-size: 12px;
+      font-family: inherit
+    }
+
+    .quiz-ctrl label {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      color: var(--ts)
+    }
+
+    .startbtn {
+      padding: 7px 16px;
+      border-radius: 8px;
+      background: var(--p);
+      color: #fff;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit
+    }
+
+    .qans {
+      display: none;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: #FAFAFE;
+      border-radius: 10px;
+      border-left: 3px solid var(--p);
+      font-size: 13px;
+      line-height: 1.8
+    }
+
+    .qans ul {
+      padding-left: 1.1rem
+    }
+
+    .qans li {
+      margin-bottom: 4px
+    }
+
+    .qans b {
+      color: var(--p)
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- 로그인 -->
-<div id="login-screen">
-  <div class="login-box">
-    <div style="font-size:48px">🧗</div>
-    <h2>구술시험 최종판</h2>
-    <p>인증된 수강생만 이용할 수 있습니다</p>
-    <label class="login-label">이름</label>
-    <input id="inp-name" class="login-input" type="text" placeholder="이름을 입력하세요">
-    <label class="login-label">비밀번호</label>
-    <input id="inp-pw" class="login-input" type="password" placeholder="비밀번호를 입력하세요">
-    <span id="login-err"></span>
-    <button id="login-btn">입장하기</button>
-    <p class="login-note">비밀번호를 모르시면 담당 강사에게 문의하세요</p>
-  </div>
-</div>
-
-<!-- 메인 -->
-<div id="main-content">
-<div class="hero">
-  <h1>🧗 스포츠지도사 구술시험 최종판</h1>
-  <p>2025 기출 + 교재 완전 반영 · 174문제 + OX 30문제</p>
-</div>
-<div class="tab-wrap">
-  <div class="tabs">
-    <div class="tab on" onclick="showTab('qbank',this)">📚 문제은행</div>
-    <div class="tab" onclick="showTab('quiz',this)">✏️ 퀴즈모드</div>
-    <div class="tab" onclick="showTab('ox',this)">⭕ OX퀴즈</div>
-  </div>
-</div>
-<div class="content">
-  <div id="qbank" class="sec vis">
-    <div class="knowbar">
-      <span class="knowstat" id="know-stat">학습 진도: 0 / 0</span>
-      <div class="knowprog"><div class="knowfill" id="know-fill" style="width:0%"></div></div>
-      <button class="knowbtn" id="hide-btn" onclick="toggleHide(this)">✅ 아는 문제 숨기기</button>
-      <button class="knowbtn" onclick="resetKnown()" style="color:var(--r)">↺ 초기화</button>
+  <!-- 로그인 -->
+  <div id="login-screen">
+    <div class="login-box">
+      <div style="font-size:48px">🧗</div>
+      <h2>구술시험 최종판</h2>
+      <p>인증된 수강생만 이용할 수 있습니다</p>
+      <label class="login-label">이름</label>
+      <input id="inp-name" class="login-input" type="text" placeholder="이름을 입력하세요">
+      <label class="login-label">비밀번호</label>
+      <input id="inp-pw" class="login-input" type="password" placeholder="비밀번호를 입력하세요">
+      <span id="login-err"></span>
+      <button id="login-btn">입장하기</button>
+      <p class="login-note">비밀번호를 모르시면 담당 강사에게 문의하세요</p>
     </div>
-    <div class="filter-scroll">
-      <div class="fbtn on" onclick="filterQ(this,'all')">전체</div>
-      <div class="fbtn" onclick="filterQ(this,'climbing')">🧗 클라이밍</div>
-      <div class="fbtn" onclick="filterQ(this,'rule')">📋 경기규정</div>
-      <div class="fbtn" onclick="filterQ(this,'safety')">⛑️ 안전</div>
-      <div class="fbtn" onclick="filterQ(this,'hiking')">🏔️ 등산</div>
-      <div class="fbtn" onclick="filterQ(this,'nutrition')">🥗 영양</div>
-      <div class="fbtn" onclick="filterQ(this,'gear')">🔧 장비</div>
-      <div class="fbtn" onclick="filterQ(this,'teach')">📖 지도법</div>
-    </div>
-    <div id="qcount" style="font-size:12px;color:var(--ts);margin-bottom:.75rem"></div>
-    <div id="qlist"></div>
   </div>
-  <div id="quiz" class="sec">
-    <div class="quiz-ctrl">
-      <span>범위</span>
-      <select id="qcat">
-        <option value="all">전체</option>
-        <option value="climbing">클라이밍</option>
-        <option value="rule">경기규정</option>
-        <option value="safety">안전</option>
-        <option value="hiking">등산</option>
-        <option value="nutrition">영양</option>
-        <option value="gear">장비</option>
-        <option value="teach">지도법</option>
-      </select>
-      <span>문제 수</span>
-      <select id="qnum">
-        <option value="10">10문제</option>
-        <option value="20">20문제</option>
-        <option value="30">30문제</option>
-        <option value="999">전체</option>
-      </select>
-      <label><input type="checkbox" id="skip-known"> 아는 문제 제외</label>
-      <button class="startbtn" onclick="startQuiz()">시작 ▶</button>
+
+  <!-- 메인 -->
+  <div id="main-content">
+    <div class="hero">
+      <h1>🧗 스포츠지도사 구술시험 최종판</h1>
+      <p>2025 기출 + 교재 완전 반영 · 174문제 + OX 30문제</p>
     </div>
-    <div id="quiz-wrap"></div>
-  </div>
-  <div id="ox" class="sec"><div id="ox-wrap"></div></div>
-</div>
-</div><!-- /main-content -->
+    <div class="tab-wrap">
+      <div class="tabs">
+        <div class="tab on" onclick="showTab('qbank',this)">📚 문제은행</div>
+        <div class="tab" onclick="showTab('quiz',this)">✏️ 퀴즈모드</div>
+        <div class="tab" onclick="showTab('ox',this)">⭕ OX퀴즈</div>
+      </div>
+    </div>
+    <div class="content">
+      <div id="qbank" class="sec vis">
+        <div class="knowbar">
+          <span class="knowstat" id="know-stat">학습 진도: 0 / 0</span>
+          <div class="knowprog">
+            <div class="knowfill" id="know-fill" style="width:0%"></div>
+          </div>
+          <button class="knowbtn" id="hide-btn" onclick="toggleHide(this)">✅ 아는 문제 숨기기</button>
+          <button class="knowbtn" onclick="resetKnown()" style="color:var(--r)">↺ 초기화</button>
+        </div>
+        <div class="filter-scroll">
+          <div class="fbtn on" onclick="filterQ(this,'all')">전체</div>
+          <div class="fbtn" onclick="filterQ(this,'climbing')">🧗 클라이밍</div>
+          <div class="fbtn" onclick="filterQ(this,'rule')">📋 경기규정</div>
+          <div class="fbtn" onclick="filterQ(this,'safety')">⛑️ 안전</div>
+          <div class="fbtn" onclick="filterQ(this,'hiking')">🏔️ 등산</div>
+          <div class="fbtn" onclick="filterQ(this,'nutrition')">🥗 영양</div>
+          <div class="fbtn" onclick="filterQ(this,'gear')">🔧 장비</div>
+          <div class="fbtn" onclick="filterQ(this,'teach')">📖 지도법</div>
+        </div>
+        <div id="qcount" style="font-size:12px;color:var(--ts);margin-bottom:.75rem"></div>
+        <div id="qlist"></div>
+      </div>
+      <div id="quiz" class="sec">
+        <div class="quiz-ctrl">
+          <span>범위</span>
+          <select id="qcat">
+            <option value="all">전체</option>
+            <option value="climbing">클라이밍</option>
+            <option value="rule">경기규정</option>
+            <option value="safety">안전</option>
+            <option value="hiking">등산</option>
+            <option value="nutrition">영양</option>
+            <option value="gear">장비</option>
+            <option value="teach">지도법</option>
+          </select>
+          <span>문제 수</span>
+          <select id="qnum">
+            <option value="10">10문제</option>
+            <option value="20">20문제</option>
+            <option value="30">30문제</option>
+            <option value="999">전체</option>
+          </select>
+          <label><input type="checkbox" id="skip-known"> 아는 문제 제외</label>
+          <button class="startbtn" onclick="startQuiz()">시작 ▶</button>
+        </div>
+        <div id="quiz-wrap"></div>
+      </div>
+      <div id="ox" class="sec">
+        <div id="ox-wrap"></div>
+      </div>
+    </div>
+  </div><!-- /main-content -->
 
-<script src="questions.js"></script>
-<script>
-const CAT={climbing:'클라이밍',rule:'경기규정',safety:'안전·사고',hiking:'등산',nutrition:'영양',gear:'장비',teach:'지도법'};
-const BDGE={climbing:'bc',rule:'br',safety:'bs',hiking:'bh',nutrition:'bn',gear:'bt',teach:'bg2'};
-const FB='https://sports-quiz-60fae-default-rtdb.firebaseio.com';
-const CODES={'kim-4493':'김진호','oh-4946':'오혜진','yun-7007':'윤재원','jang-6656':'장미정','jang-6224':'장윤희','jang-7888':'장은정','jo-8925':'조남석','jin-5569':'진광주','hong-2269':'홍승우'};
+  <script src="questions.js"></script>
+  <script>
+    const CAT = { climbing: '클라이밍', rule: '경기규정', safety: '안전·사고', hiking: '등산', nutrition: '영양', gear: '장비', teach: '지도법' };
+    const BDGE = { climbing: 'bc', rule: 'br', safety: 'bs', hiking: 'bh', nutrition: 'bn', gear: 'bt', teach: 'bg2' };
+    const FB = 'https://sports-quiz-60fae-default-rtdb.firebaseio.com';
+    const CODES = {
+      'kim-4493': '김진호',
+      'oh-4946': '오혜진',
+      'yun-7007': '윤재원',
+      'jang-6656': '장미정',
+      'jang-6224': '장윤희',
+      'jang-7888': '장은정',
+      'jo-8925': '조남석',
+      'jin-5569': '진광주',
+      'hong-2269': '홍승우',
+      'hong-2324': '홍정희',
+    };
 
-// 문제 데이터는 questions.js에서 로드됩니다
+    // 문제 데이터는 questions.js에서 로드됩니다
 
-function findEW(q){for(const e of EXPERT_WRONG){if(q.q.includes(e.key))return e.wrongs;}return null;}
+    function findEW(q) { for (const e of EXPERT_WRONG) { if (q.q.includes(e.key)) return e.wrongs; } return null; }
 
-// ── 상태 ──
-let curCat='all', hideKnown=false, knownSet=new Set(), progress={};
-let curPw=null, curToken=null;
-let qData=[],qIdx=0,qScore=0,qAnswered=false;
-let oxData=[],oxIdx=0,oxScore=0;
-const QA_ORIG=[...QA];
+    // ── 상태 ──
+    let curCat = 'all', hideKnown = false, knownSet = new Set(), progress = {};
+    let curPw = null, curToken = null;
+    let qData = [], qIdx = 0, qScore = 0, qAnswered = false;
+    let oxData = [], oxIdx = 0, oxScore = 0;
+    const QA_ORIG = [...QA];
 
-// ── 로그인 ──
-document.getElementById('login-btn').addEventListener('click', doLogin);
-document.getElementById('inp-pw').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
-document.getElementById('inp-name').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('inp-pw').focus(); });
+    // ── 로그인 ──
+    document.getElementById('login-btn').addEventListener('click', doLogin);
+    document.getElementById('inp-pw').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+    document.getElementById('inp-name').addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('inp-pw').focus(); });
 
-function doLogin(){
-  const name = document.getElementById('inp-name').value.trim();
-  const pw   = document.getElementById('inp-pw').value.trim();
-  const err  = document.getElementById('login-err');
-  const btn  = document.getElementById('login-btn');
+    function doLogin() {
+      const name = document.getElementById('inp-name').value.trim();
+      const pw = document.getElementById('inp-pw').value.trim();
+      const err = document.getElementById('login-err');
+      const btn = document.getElementById('login-btn');
 
-  if(!name){ err.textContent='이름을 입력해 주세요.'; return; }
-  if(!pw)  { err.textContent='비밀번호를 입력해 주세요.'; return; }
-  if(!CODES[pw]){ err.textContent='비밀번호가 올바르지 않습니다.'; document.getElementById('inp-pw').value=''; return; }
-  if(CODES[pw]!==name){ err.textContent='이름이 코드와 일치하지 않습니다.'; return; }
+      if (!name) { err.textContent = '이름을 입력해 주세요.'; return; }
+      if (!pw) { err.textContent = '비밀번호를 입력해 주세요.'; return; }
+      if (!CODES[pw]) { err.textContent = '비밀번호가 올바르지 않습니다.'; document.getElementById('inp-pw').value = ''; return; }
+      if (CODES[pw] !== name) { err.textContent = '이름이 코드와 일치하지 않습니다.'; return; }
 
-  btn.textContent='확인 중...';
-  btn.disabled=true;
-  err.textContent='';
+      btn.textContent = '확인 중...';
+      btn.disabled = true;
+      err.textContent = '';
 
-  const now=new Date();
-  const time=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
-  const device=/iPad|iPhone|iPod/.test(navigator.userAgent)?'iPhone':/Android/.test(navigator.userAgent)?'Android':'PC';
-  const sk=pw.replace(/-/g,'_');
-  const token=Math.random().toString(36).slice(2)+Date.now().toString(36);
+      const now = new Date();
+      const time = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+      const device = /iPad|iPhone|iPod/.test(navigator.userAgent) ? 'iPhone' : /Android/.test(navigator.userAgent) ? 'Android' : 'PC';
+      const sk = pw.replace(/-/g, '_');
+      const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
 
-  fetch(FB+'/sessions/'+sk+'.json')
-    .then(r=>r.json())
-    .then(ex=>{
-      if(ex&&ex.token){
-        const elapsed=Date.now()-(ex.lastBeat||0);
-        if(elapsed<30*1000){
-          err.textContent='⚠️ 이미 다른 기기('+ex.device+')에서 접속 중입니다.';
-          btn.textContent='입장하기'; btn.disabled=false;
-          return Promise.reject('block');
-        }
+      fetch(FB + '/sessions/' + sk + '.json')
+        .then(r => r.json())
+        .then(ex => {
+          if (ex && ex.token) {
+            const elapsed = Date.now() - (ex.lastBeat || 0);
+            if (elapsed < 30 * 1000) {
+              err.textContent = '⚠️ 이미 다른 기기(' + ex.device + ')에서 접속 중입니다.';
+              btn.textContent = '입장하기'; btn.disabled = false;
+              return Promise.reject('block');
+            }
+          }
+          return fetch(FB + '/sessions/' + sk + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, token, time, device, lastBeat: Date.now() }) });
+        })
+        .then(() => {
+          fetch(FB + '/logs.json', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, time, device }) }).catch(() => { });
+          curPw = sk; curToken = token;
+          // 하트비트
+          setInterval(() => {
+            fetch(FB + '/sessions/' + sk + '.json').then(r => r.json()).then(cur => {
+              if (!cur || cur.token !== curToken) { alert('⚠️ 관리자에 의해 접속이 종료되었습니다.'); location.reload(); }
+              else fetch(FB + '/sessions/' + sk + '/lastBeat.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: Date.now().toString() }).catch(() => { });
+            }).catch(() => { });
+          }, 30000);
+          window.addEventListener('beforeunload', () => navigator.sendBeacon(FB + '/sessions/' + sk + '.json', JSON.stringify(null)));
+          // 학습 기록 로드 후 입장
+          fetch(FB + '/progress/' + sk + '.json').then(r => r.json()).then(d => { if (d) progress = d; }).catch(() => { }).finally(() => enterApp());
+        })
+        .catch(e => {
+          if (e === 'block') return;
+          // Firebase 오류 시 바로 입장
+          curPw = sk; curToken = token;
+          enterApp();
+        });
+    }
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function enterApp() {
+      QA.sort((a, b) => {
+        const ai = QA_ORIG.indexOf(a), bi = QA_ORIG.indexOf(b);
+        const pa = progress[ai], pb = progress[bi];
+        if (!pa && pb) return -1; if (pa && !pb) return 1; if (!pa && !pb) return Math.random() - .5;
+        if (pa.score !== pb.score) return pa.score - pb.score;
+        return (pb.tries || 0) - (pa.tries || 0);
+      });
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+      renderQBank('all');
+    }
+
+    function saveP(idx, score) {
+      if (!curPw) return;
+      const prev = progress[idx] || { score: 0, tries: 0 };
+      progress[idx] = { score: Math.max(prev.score, score), tries: (prev.tries || 0) + 1, lastSeen: Date.now() };
+      fetch(FB + '/progress/' + curPw + '/' + idx + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(progress[idx]) }).catch(() => { });
+    }
+
+    // ── 문제은행 ──
+    function badge(cat) { return '<span class="badge ' + BDGE[cat] + '">' + CAT[cat] + '</span>'; }
+
+    function renderQBank(cat) {
+      curCat = cat;
+      const list = cat === 'all' ? QA : QA.filter(q => q.cat === cat);
+      const total = list.length;
+      const knownN = [...knownSet].filter(i => cat === 'all' || QA[i] && QA[i].cat === cat).length;
+      const pct = total > 0 ? Math.round(knownN / total * 100) : 0;
+      document.getElementById('know-stat').textContent = '학습 진도: ' + knownN + ' / ' + total + ' (' + pct + '%)';
+      document.getElementById('know-fill').style.width = pct + '%';
+      const vis = total - (hideKnown ? knownN : 0);
+      document.getElementById('qcount').textContent = vis + '문제 표시 (전체 ' + total + '문제)';
+      document.getElementById('qlist').innerHTML = list.map((item, i) => {
+        const gi = QA_ORIG.indexOf(item);
+        const isK = knownSet.has(gi);
+        return '<div class="qcard' + (isK ? ' known-card' : '') + '" id="qc' + gi + '" style="' + (isK && hideKnown ? 'display:none' : '') + '">' +
+          '<div class="qhead"><span class="qnum">Q' + (i + 1) + '</span><div class="qtxt">' + item.q + '</div></div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">' +
+          badge(item.cat) +
+          '<button class="kbtn' + (isK ? ' known' : '') + '" onclick="toggleKnown(' + gi + ',this)">' + (isK ? '✅ 알고 있음' : '✅ 알고 있어요') + '</button>' +
+          '</div>' +
+          '<button class="abtn" onclick="toggleAns(this)">▶ 정답 보기</button>' +
+          '<div class="answer">' + item.a + '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    function toggleAns(btn) { const a = btn.nextElementSibling; a.classList.toggle('show'); btn.textContent = a.classList.contains('show') ? '▼ 닫기' : '▶ 정답 보기'; }
+
+    function filterQ(btn, cat) { document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('on')); btn.classList.add('on'); renderQBank(cat); }
+
+    function toggleKnown(gi, btn) {
+      if (knownSet.has(gi)) { knownSet.delete(gi); btn.textContent = '✅ 알고 있어요'; btn.classList.remove('known'); const c = document.getElementById('qc' + gi); if (c) { c.classList.remove('known-card'); c.style.display = ''; } }
+      else { knownSet.add(gi); btn.textContent = '✅ 알고 있음!'; btn.classList.add('known'); const c = document.getElementById('qc' + gi); if (c) { c.classList.add('known-card'); if (hideKnown) c.style.display = 'none'; } }
+      try { localStorage.setItem('knownQ', JSON.stringify([...knownSet])); } catch (e) { }
+      renderQBank(curCat);
+    }
+
+    function toggleHide(btn) {
+      hideKnown = !hideKnown;
+      btn.classList.toggle('on', hideKnown);
+      btn.textContent = hideKnown ? '👁 전체 보기' : '✅ 아는 문제 숨기기';
+      document.querySelectorAll('.qcard').forEach(c => { if (c.classList.contains('known-card')) c.style.display = hideKnown ? 'none' : ''; });
+      renderQBank(curCat);
+    }
+
+    function resetKnown() { if (!confirm('학습 진도를 초기화할까요?')) return; knownSet.clear(); try { localStorage.removeItem('knownQ'); } catch (e) { } renderQBank(curCat); }
+
+    // ── 퀴즈 ──
+    function shorten(t) { return t.length > 75 ? t.slice(0, 73) + '…' : t; }
+    function getLi(html) { const d = document.createElement('div'); d.innerHTML = html; const l = [...d.querySelectorAll('li')]; return l.length ? l.map(x => x.textContent.replace(/\s+/g, ' ').trim()) : [d.textContent.replace(/\s+/g, ' ').trim()]; }
+
+    function startQuiz() {
+      const cat = document.getElementById('qcat').value;
+      const num = parseInt(document.getElementById('qnum').value);
+      const skip = document.getElementById('skip-known').checked;
+      let pool = cat === 'all' ? [...QA] : QA.filter(q => q.cat === cat);
+      if (skip) pool = pool.filter(item => !knownSet.has(QA_ORIG.indexOf(item)));
+      if (pool.length === 0) { document.getElementById('quiz-wrap').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--ts)">모든 문제를 알고 있어요! 초기화 후 다시 도전하세요.</div>'; return; }
+      qData = pool.sort(() => Math.random() - .5).slice(0, Math.min(num, pool.length));
+      qIdx = 0; qScore = 0; renderQ();
+    }
+
+    function renderQ() {
+      const el = document.getElementById('quiz-wrap');
+      if (qIdx >= qData.length) {
+        const pct = Math.round(qScore / qData.length * 100);
+        el.innerHTML = '<div class="scorebox"><div style="font-size:48px">' + (pct >= 80 ? '🏆' : pct >= 60 ? '😊' : '📚') + '</div><div class="scorenum">' + qScore + ' / ' + qData.length + '점</div><div class="scoretxt">' + (pct >= 80 ? '훌륭해요! 합격권입니다!' : pct >= 60 ? '조금 더 복습하면 완벽해요!' : '핵심 문제를 다시 공부해보세요!') + '</div><div class="statgrid"><div class="stat"><div class="statn">' + qScore + '</div><div class="statl">정답</div></div><div class="stat"><div class="statn">' + (qData.length - qScore) + '</div><div class="statl">오답</div></div><div class="stat"><div class="statn">' + pct + '%</div><div class="statl">정답률</div></div></div><button class="navbtn p" onclick="startQuiz()">다시 풀기 ↺</button></div>';
+        return;
       }
-      return fetch(FB+'/sessions/'+sk+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,token,time,device,lastBeat:Date.now()})});
-    })
-    .then(()=>{
-      fetch(FB+'/logs.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,time,device})}).catch(()=>{});
-      curPw=sk; curToken=token;
-      // 하트비트
-      setInterval(()=>{
-        fetch(FB+'/sessions/'+sk+'.json').then(r=>r.json()).then(cur=>{
-          if(!cur||cur.token!==curToken){alert('⚠️ 관리자에 의해 접속이 종료되었습니다.');location.reload();}
-          else fetch(FB+'/sessions/'+sk+'/lastBeat.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:Date.now().toString()}).catch(()=>{});
-        }).catch(()=>{});
-      },30000);
-      window.addEventListener('beforeunload',()=>navigator.sendBeacon(FB+'/sessions/'+sk+'.json',JSON.stringify(null)));
-      // 학습 기록 로드 후 입장
-      fetch(FB+'/progress/'+sk+'.json').then(r=>r.json()).then(d=>{if(d)progress=d;}).catch(()=>{}).finally(()=>enterApp());
-    })
-    .catch(e=>{
-      if(e==='block') return;
-      // Firebase 오류 시 바로 입장
-      curPw=sk; curToken=token;
-      enterApp();
-    });
-}
+      const q = qData[qIdx];
+      const lis = getLi(q.a);
+      const ct = shorten(lis[0]);
+      const used = new Set([ct]);
+      const wrongs = [];
+      const ew = findEW(q);
+      if (ew) { for (const w of ew.sort(() => Math.random() - .5)) { if (wrongs.length >= 3) break; const s = shorten(w); if (!used.has(s)) { used.add(s); wrongs.push(s); } } }
+      if (wrongs.length < 3) {
+        const pool2 = [...QA.filter(x => x !== q && x.cat === q.cat).sort(() => Math.random() - .5), ...QA.filter(x => x !== q && x.cat !== q.cat).sort(() => Math.random() - .5)];
+        for (const item of pool2) { if (wrongs.length >= 3) break; const s = shorten(getLi(item.a)[0]); if (!used.has(s)) { used.add(s); wrongs.push(s); } }
+      }
+      const choices = [{ t: ct, ok: true }, ...wrongs.map(w => ({ t: w, ok: false }))].sort(() => Math.random() - .5);
+      qAnswered = false;
+      const pct = Math.round(qIdx / qData.length * 100);
+      el.innerHTML = '<div class="qprog">' + (qIdx + 1) + ' / ' + qData.length + ' &nbsp;' + badge(q.cat) + '<div class="progbar"><div class="progfill" style="width:' + pct + '%"></div></div></div>' +
+        '<div class="qbig">❓ ' + q.q + '</div>' +
+        '<p style="font-size:12px;color:var(--ts);margin-bottom:12px">아래 보기 중 올바른 답을 고르세요</p>' +
+        '<div class="choices">' + choices.map((c, i) => '<button class="chbtn" onclick="checkQ(this,' + c.ok + ')">' + ['①', '②', '③', '④'][i] + ' ' + c.t + '</button>').join('') + '</div>' +
+        '<div class="fb" id="qfb"></div>' +
+        '<div class="qans" id="qans">' + q.a + '</div>' +
+        '<button class="navbtn p" id="qnext" style="display:none" onclick="nextQ()">다음 문제 →</button>';
+    }
 
-function pad(n){return String(n).padStart(2,'0');}
+    function checkQ(btn, correct) {
+      if (qAnswered) return; qAnswered = true;
+      document.querySelectorAll('.chbtn').forEach(b => b.style.pointerEvents = 'none');
+      const gi = QA_ORIG.indexOf(qData[qIdx]);
+      if (correct) { btn.classList.add('correct'); qScore++; saveP(gi, 5); document.getElementById('qfb').innerHTML = '<span style="color:#1D9E75;font-weight:500">✓ 정답입니다!</span>'; }
+      else { btn.classList.add('wrong'); saveP(gi, 1); document.getElementById('qfb').innerHTML = '<span style="color:#A32D2D;font-weight:500">✗ 틀렸습니다. 아래 정답을 확인하세요.</span>'; }
+      document.getElementById('qans').style.display = 'block';
+      document.getElementById('qnext').style.display = 'inline-block';
+    }
+    function nextQ() { qIdx++; renderQ(); }
 
-function enterApp(){
-  QA.sort((a,b)=>{
-    const ai=QA_ORIG.indexOf(a), bi=QA_ORIG.indexOf(b);
-    const pa=progress[ai], pb=progress[bi];
-    if(!pa&&pb) return -1; if(pa&&!pb) return 1; if(!pa&&!pb) return Math.random()-.5;
-    if(pa.score!==pb.score) return pa.score-pb.score;
-    return (pb.tries||0)-(pa.tries||0);
-  });
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('main-content').style.display='block';
-  renderQBank('all');
-}
+    // ── OX ──
+    function startOX() { oxData = [...OX].sort(() => Math.random() - .5); oxIdx = 0; oxScore = 0; renderOX(); }
+    function renderOX() {
+      const el = document.getElementById('ox-wrap');
+      if (oxIdx >= oxData.length) {
+        const pct = Math.round(oxScore / oxData.length * 100);
+        el.innerHTML = '<div class="scorebox"><div style="font-size:48px">' + (pct >= 90 ? '🏆' : pct >= 70 ? '😊' : '📚') + '</div><div class="scorenum">' + oxScore + ' / ' + oxData.length + '점</div><div class="scoretxt">' + (pct >= 90 ? '완벽!' : pct >= 70 ? '잘 했어요!' : '다시 복습하세요.') + '</div><button class="navbtn p" onclick="startOX()">다시 풀기 ↺</button></div>';
+        return;
+      }
+      const q = oxData[oxIdx];
+      const pct = Math.round(oxIdx / oxData.length * 100);
+      el.innerHTML = '<div class="qprog">OX ' + (oxIdx + 1) + ' / ' + oxData.length + ' · 현재 ' + oxScore + '점<div class="progbar"><div class="progfill" style="width:' + pct + '%"></div></div></div>' +
+        '<div class="oxq">' + q.q + '</div>' +
+        '<div class="oxbtns"><button class="oxbtn" onclick="checkOX(this,true)">⭕</button><button class="oxbtn" onclick="checkOX(this,false)">❌</button></div>' +
+        '<div class="fb" id="oxfb"></div>' +
+        '<div class="oxexp" id="oxexp">💡 ' + q.ex + '</div>' +
+        '<button class="navbtn p" onclick="nextOX()">다음 →</button>';
+    }
+    function checkOX(btn, val) {
+      const q = oxData[oxIdx];
+      document.querySelectorAll('.oxbtn').forEach(b => b.style.pointerEvents = 'none');
+      document.getElementById('oxexp').classList.add('show');
+      const gi = OX.indexOf(q);
+      if (val === q.a) { btn.classList.add('correct'); oxScore++; saveP('ox_' + gi, 5); document.getElementById('oxfb').innerHTML = '<span style="color:#1D9E75">✓ 정답!</span>'; }
+      else { btn.classList.add('wrong'); saveP('ox_' + gi, 1); document.getElementById('oxfb').innerHTML = '<span style="color:#A32D2D">✗ 틀렸습니다. 정답: ' + (q.a ? '⭕' : '❌') + '</span>'; }
+    }
+    function nextOX() { oxIdx++; renderOX(); }
 
-function saveP(idx,score){
-  if(!curPw) return;
-  const prev=progress[idx]||{score:0,tries:0};
-  progress[idx]={score:Math.max(prev.score,score),tries:(prev.tries||0)+1,lastSeen:Date.now()};
-  fetch(FB+'/progress/'+curPw+'/'+idx+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(progress[idx])}).catch(()=>{});
-}
+    // ── 탭 ──
+    function showTab(id, el) {
+      document.querySelectorAll('.sec').forEach(s => s.classList.remove('vis'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+      document.getElementById(id).classList.add('vis');
+      el.classList.add('on');
+      if (id === 'ox' && oxData.length === 0) startOX();
+    }
 
-// ── 문제은행 ──
-function badge(cat){return '<span class="badge '+BDGE[cat]+'">'+CAT[cat]+'</span>';}
-
-function renderQBank(cat){
-  curCat=cat;
-  const list=cat==='all'?QA:QA.filter(q=>q.cat===cat);
-  const total=list.length;
-  const knownN=[...knownSet].filter(i=>cat==='all'||QA[i]&&QA[i].cat===cat).length;
-  const pct=total>0?Math.round(knownN/total*100):0;
-  document.getElementById('know-stat').textContent='학습 진도: '+knownN+' / '+total+' ('+pct+'%)';
-  document.getElementById('know-fill').style.width=pct+'%';
-  const vis=total-(hideKnown?knownN:0);
-  document.getElementById('qcount').textContent=vis+'문제 표시 (전체 '+total+'문제)';
-  document.getElementById('qlist').innerHTML=list.map((item,i)=>{
-    const gi=QA_ORIG.indexOf(item);
-    const isK=knownSet.has(gi);
-    return '<div class="qcard'+(isK?' known-card':'')+'" id="qc'+gi+'" style="'+(isK&&hideKnown?'display:none':'')+'">'+
-      '<div class="qhead"><span class="qnum">Q'+(i+1)+'</span><div class="qtxt">'+item.q+'</div></div>'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">'+
-      badge(item.cat)+
-      '<button class="kbtn'+(isK?' known':'')+'" onclick="toggleKnown('+gi+',this)">'+(isK?'✅ 알고 있음':'✅ 알고 있어요')+'</button>'+
-      '</div>'+
-      '<button class="abtn" onclick="toggleAns(this)">▶ 정답 보기</button>'+
-      '<div class="answer">'+item.a+'</div>'+
-      '</div>';
-  }).join('');
-}
-
-function toggleAns(btn){const a=btn.nextElementSibling;a.classList.toggle('show');btn.textContent=a.classList.contains('show')?'▼ 닫기':'▶ 정답 보기';}
-
-function filterQ(btn,cat){document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderQBank(cat);}
-
-function toggleKnown(gi,btn){
-  if(knownSet.has(gi)){knownSet.delete(gi);btn.textContent='✅ 알고 있어요';btn.classList.remove('known');const c=document.getElementById('qc'+gi);if(c){c.classList.remove('known-card');c.style.display='';}}
-  else{knownSet.add(gi);btn.textContent='✅ 알고 있음!';btn.classList.add('known');const c=document.getElementById('qc'+gi);if(c){c.classList.add('known-card');if(hideKnown)c.style.display='none';}}
-  try{localStorage.setItem('knownQ',JSON.stringify([...knownSet]));}catch(e){}
-  renderQBank(curCat);
-}
-
-function toggleHide(btn){
-  hideKnown=!hideKnown;
-  btn.classList.toggle('on',hideKnown);
-  btn.textContent=hideKnown?'👁 전체 보기':'✅ 아는 문제 숨기기';
-  document.querySelectorAll('.qcard').forEach(c=>{if(c.classList.contains('known-card'))c.style.display=hideKnown?'none':'';});
-  renderQBank(curCat);
-}
-
-function resetKnown(){if(!confirm('학습 진도를 초기화할까요?'))return;knownSet.clear();try{localStorage.removeItem('knownQ');}catch(e){}renderQBank(curCat);}
-
-// ── 퀴즈 ──
-function shorten(t){return t.length>75?t.slice(0,73)+'…':t;}
-function getLi(html){const d=document.createElement('div');d.innerHTML=html;const l=[...d.querySelectorAll('li')];return l.length?l.map(x=>x.textContent.replace(/\s+/g,' ').trim()):[ d.textContent.replace(/\s+/g,' ').trim()];}
-
-function startQuiz(){
-  const cat=document.getElementById('qcat').value;
-  const num=parseInt(document.getElementById('qnum').value);
-  const skip=document.getElementById('skip-known').checked;
-  let pool=cat==='all'?[...QA]:QA.filter(q=>q.cat===cat);
-  if(skip) pool=pool.filter(item=>!knownSet.has(QA_ORIG.indexOf(item)));
-  if(pool.length===0){document.getElementById('quiz-wrap').innerHTML='<div style="text-align:center;padding:2rem;color:var(--ts)">모든 문제를 알고 있어요! 초기화 후 다시 도전하세요.</div>';return;}
-  qData=pool.sort(()=>Math.random()-.5).slice(0,Math.min(num,pool.length));
-  qIdx=0;qScore=0;renderQ();
-}
-
-function renderQ(){
-  const el=document.getElementById('quiz-wrap');
-  if(qIdx>=qData.length){
-    const pct=Math.round(qScore/qData.length*100);
-    el.innerHTML='<div class="scorebox"><div style="font-size:48px">'+(pct>=80?'🏆':pct>=60?'😊':'📚')+'</div><div class="scorenum">'+qScore+' / '+qData.length+'점</div><div class="scoretxt">'+(pct>=80?'훌륭해요! 합격권입니다!':pct>=60?'조금 더 복습하면 완벽해요!':'핵심 문제를 다시 공부해보세요!')+'</div><div class="statgrid"><div class="stat"><div class="statn">'+qScore+'</div><div class="statl">정답</div></div><div class="stat"><div class="statn">'+(qData.length-qScore)+'</div><div class="statl">오답</div></div><div class="stat"><div class="statn">'+pct+'%</div><div class="statl">정답률</div></div></div><button class="navbtn p" onclick="startQuiz()">다시 풀기 ↺</button></div>';
-    return;
-  }
-  const q=qData[qIdx];
-  const lis=getLi(q.a);
-  const ct=shorten(lis[0]);
-  const used=new Set([ct]);
-  const wrongs=[];
-  const ew=findEW(q);
-  if(ew){for(const w of ew.sort(()=>Math.random()-.5)){if(wrongs.length>=3)break;const s=shorten(w);if(!used.has(s)){used.add(s);wrongs.push(s);}}}
-  if(wrongs.length<3){
-    const pool2=[...QA.filter(x=>x!==q&&x.cat===q.cat).sort(()=>Math.random()-.5),...QA.filter(x=>x!==q&&x.cat!==q.cat).sort(()=>Math.random()-.5)];
-    for(const item of pool2){if(wrongs.length>=3)break;const s=shorten(getLi(item.a)[0]);if(!used.has(s)){used.add(s);wrongs.push(s);}}
-  }
-  const choices=[{t:ct,ok:true},...wrongs.map(w=>({t:w,ok:false}))].sort(()=>Math.random()-.5);
-  qAnswered=false;
-  const pct=Math.round(qIdx/qData.length*100);
-  el.innerHTML='<div class="qprog">'+( qIdx+1)+' / '+qData.length+' &nbsp;'+badge(q.cat)+'<div class="progbar"><div class="progfill" style="width:'+pct+'%"></div></div></div>'+
-    '<div class="qbig">❓ '+q.q+'</div>'+
-    '<p style="font-size:12px;color:var(--ts);margin-bottom:12px">아래 보기 중 올바른 답을 고르세요</p>'+
-    '<div class="choices">'+choices.map((c,i)=>'<button class="chbtn" onclick="checkQ(this,'+c.ok+')">'+['①','②','③','④'][i]+' '+c.t+'</button>').join('')+'</div>'+
-    '<div class="fb" id="qfb"></div>'+
-    '<div class="qans" id="qans">'+q.a+'</div>'+
-    '<button class="navbtn p" id="qnext" style="display:none" onclick="nextQ()">다음 문제 →</button>';
-}
-
-function checkQ(btn,correct){
-  if(qAnswered)return; qAnswered=true;
-  document.querySelectorAll('.chbtn').forEach(b=>b.style.pointerEvents='none');
-  const gi=QA_ORIG.indexOf(qData[qIdx]);
-  if(correct){btn.classList.add('correct');qScore++;saveP(gi,5);document.getElementById('qfb').innerHTML='<span style="color:#1D9E75;font-weight:500">✓ 정답입니다!</span>';}
-  else{btn.classList.add('wrong');saveP(gi,1);document.getElementById('qfb').innerHTML='<span style="color:#A32D2D;font-weight:500">✗ 틀렸습니다. 아래 정답을 확인하세요.</span>';}
-  document.getElementById('qans').style.display='block';
-  document.getElementById('qnext').style.display='inline-block';
-}
-function nextQ(){qIdx++;renderQ();}
-
-// ── OX ──
-function startOX(){oxData=[...OX].sort(()=>Math.random()-.5);oxIdx=0;oxScore=0;renderOX();}
-function renderOX(){
-  const el=document.getElementById('ox-wrap');
-  if(oxIdx>=oxData.length){
-    const pct=Math.round(oxScore/oxData.length*100);
-    el.innerHTML='<div class="scorebox"><div style="font-size:48px">'+(pct>=90?'🏆':pct>=70?'😊':'📚')+'</div><div class="scorenum">'+oxScore+' / '+oxData.length+'점</div><div class="scoretxt">'+(pct>=90?'완벽!':pct>=70?'잘 했어요!':'다시 복습하세요.')+'</div><button class="navbtn p" onclick="startOX()">다시 풀기 ↺</button></div>';
-    return;
-  }
-  const q=oxData[oxIdx];
-  const pct=Math.round(oxIdx/oxData.length*100);
-  el.innerHTML='<div class="qprog">OX '+(oxIdx+1)+' / '+oxData.length+' · 현재 '+oxScore+'점<div class="progbar"><div class="progfill" style="width:'+pct+'%"></div></div></div>'+
-    '<div class="oxq">'+q.q+'</div>'+
-    '<div class="oxbtns"><button class="oxbtn" onclick="checkOX(this,true)">⭕</button><button class="oxbtn" onclick="checkOX(this,false)">❌</button></div>'+
-    '<div class="fb" id="oxfb"></div>'+
-    '<div class="oxexp" id="oxexp">💡 '+q.ex+'</div>'+
-    '<button class="navbtn p" onclick="nextOX()">다음 →</button>';
-}
-function checkOX(btn,val){
-  const q=oxData[oxIdx];
-  document.querySelectorAll('.oxbtn').forEach(b=>b.style.pointerEvents='none');
-  document.getElementById('oxexp').classList.add('show');
-  const gi=OX.indexOf(q);
-  if(val===q.a){btn.classList.add('correct');oxScore++;saveP('ox_'+gi,5);document.getElementById('oxfb').innerHTML='<span style="color:#1D9E75">✓ 정답!</span>';}
-  else{btn.classList.add('wrong');saveP('ox_'+gi,1);document.getElementById('oxfb').innerHTML='<span style="color:#A32D2D">✗ 틀렸습니다. 정답: '+(q.a?'⭕':'❌')+'</span>';}
-}
-function nextOX(){oxIdx++;renderOX();}
-
-// ── 탭 ──
-function showTab(id,el){
-  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('vis'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.getElementById(id).classList.add('vis');
-  el.classList.add('on');
-  if(id==='ox'&&oxData.length===0) startOX();
-}
-
-// ── 초기화 ──
-try{const k=localStorage.getItem('knownQ');if(k)knownSet=new Set(JSON.parse(k));}catch(e){}
-</script>
+    // ── 초기화 ──
+    try { const k = localStorage.getItem('knownQ'); if (k) knownSet = new Set(JSON.parse(k)); } catch (e) { }
+  </script>
 </body>
+
 </html>
