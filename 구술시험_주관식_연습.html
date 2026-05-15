@@ -649,6 +649,20 @@
       const QA_ORIG = [...QA];
 
       // Firebase 설정
+      // 수강생 코드 (암호: 이름)
+      const STUDENT_CODES = {
+        'kim-4493': '김진호',
+        'oh-4946': '오혜진',
+        'yun-7007': '윤재원',
+        'jang-6656': '장미정',
+        'jang-6224': '장윤희',
+        'jang-7888': '장은정',
+        'jo-8925': '조남석',
+        'jin-5569': '진광주',
+        'hong-2269': '홍승우',
+        'hong-2324': '홍정희',
+      };
+
       const FB_URL = 'https://sports-quiz-60fae-default-rtdb.firebaseio.com';
       let currentStudent = null;
       let studentProgress = {};
@@ -930,6 +944,11 @@
               headers: { 'Content-Type': 'application/json' }, 
               body: JSON.stringify({ name, token, time, device, lastBeat: Date.now() }) 
             });
+          })
+          .catch(e => {
+            if (e === 'block') throw e;
+            console.warn('Session check/creation failed:', e);
+            return null;
           })
           .then(() => {
             fetch(FB_URL + '/logs.json', { 
