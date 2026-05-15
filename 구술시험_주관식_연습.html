@@ -932,7 +932,6 @@
             });
           })
           .then(() => {
-            // 접속 로그 기록
             fetch(FB_URL + '/logs.json', { 
               method: 'POST', 
               headers: { 'Content-Type': 'application/json' }, 
@@ -942,7 +941,6 @@
             currentStudent = pw;
             curToken = token;
 
-            // 하트비트 시작 (30초마다 생존 신고 및 중복 체크)
             setInterval(() => {
               fetch(FB_URL + '/sessions/' + sk + '.json').then(r => r.json()).then(cur => {
                 if (!cur || cur.token !== curToken) { 
@@ -957,22 +955,29 @@
               }).catch(() => { });
             }, 30000);
 
-            // 종료 시 세션 삭제 (비컨 사용)
             window.addEventListener('beforeunload', () => navigator.sendBeacon(FB_URL + '/sessions/' + sk + '.json', JSON.stringify(null)));
 
-            // 학습 기록 로드 후 입장
             return loadProgress(pw);
           })
-          .then(() => {
-            enterApp();
-          })
+          .then(() => enterApp())
           .catch(e => {
             if (e === 'block') return;
-            console.error('Login Error:', e);
-            // Firebase 오류 시에도 일단 입장은 허용 (오프라인 모드 배려)
             currentStudent = pw;
             enterApp();
           });
+      }
+
+      function enterApp() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        
+        // 점수 동기화
+        for (let idx in studentProgress) {
+          scores[idx] = studentProgress[idx].score;
+        }
+        
+        QA.sort(() => Math.random() - 0.5);
+        renderPractice('all');
       }
 
       function pad(n) { return String(n).padStart(2, '0'); }
@@ -1004,18 +1009,13 @@
 
       // 초기화
       window.addEventListener('DOMContentLoaded', () => {
-        // 엔터키 로그인 지원
-        document.getElementById('pw-input').addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') verifyPassword();
+        document.getElementById('inp-name').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') document.getElementById('inp-pw').focus();
         });
-        
-        QA.sort(() => Math.random() - 0.5);
-        renderPractice('all');
+        document.getElementById('inp-pw').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') doLogin();
+        });
       });
     </script>
-    </script>
-  </div><!-- /main-content -->
-
 </body>
-
 </html>
