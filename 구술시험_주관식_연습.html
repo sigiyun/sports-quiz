@@ -993,7 +993,7 @@
       async function loadProgress(pw) {
         const key = pw.replace(/-/g, '_');
         try {
-          const res = await fetch(`${FB_URL}/progress/${key}.json`);
+          const res = await fetch(`${FB_URL}/progress_practice/${key}.json`);
           const data = await res.json();
           studentProgress = data || {};
         } catch (e) { studentProgress = {}; }
@@ -1008,7 +1008,7 @@
           tries: (prev.tries || 0) + 1,
           lastSeen: Date.now()
         };
-        fetch(`${FB_URL}/progress/${key}/${qIdx}.json`, {
+        fetch(`${FB_URL}/progress_practice/${key}/${qIdx}.json`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(studentProgress[qIdx])
