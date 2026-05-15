@@ -633,7 +633,7 @@
       let examResults = [];
       let examMode = 'random';
       let currentCat = 'all';
-      const QA_ORIG = [...QA];
+      let QA_ORIG = [];
 
       // Firebase 설정
       // 수강생 코드 (암호: 이름)
@@ -782,6 +782,7 @@
         examData = pool.slice(0, count);
         examIdx = 0; examResults = [];
         renderExamQ();
+        showTab('exam', document.querySelector('.tab:nth-child(2)'));
       }
 
       function renderExamQ() {
@@ -982,6 +983,7 @@
           scores[idx] = studentProgress[idx].score;
         }
         
+        QA_ORIG = [...QA];
         QA.sort(() => Math.random() - 0.5);
         renderPractice('all');
       }
