@@ -408,14 +408,9 @@
     .filter-scroll {
       display: flex;
       gap: 6px;
-      overflow-x: auto;
-      scrollbar-width: none;
+      flex-wrap: wrap;
       padding-bottom: 4px;
       margin-bottom: 1rem
-    }
-
-    .filter-scroll::-webkit-scrollbar {
-      display: none
     }
 
     .fbtn {
@@ -437,6 +432,19 @@
       color: #fff;
       border-color: var(--purple);
       font-weight: 500
+    }
+
+    .fbtn-area {
+      background: var(--purple-dark);
+      color: #fff;
+      border-color: var(--purple-dark);
+      font-weight: 700;
+      margin-left: 4px
+    }
+
+    .fbtn-area.on {
+      background: var(--purple);
+      border-color: var(--purple)
     }
 
     /* 결과 */
@@ -573,12 +581,25 @@
       <div id="practice" class="section visible">
         <div class="filter-scroll">
           <div class="fbtn on" onclick="filterQ(this,'all')">전체</div>
-          <div class="fbtn" onclick="filterQ(this,'climbing')">🧗 클라이밍</div>
-          <div class="fbtn" onclick="filterQ(this,'rule')">📋 경기규정</div>
-          <div class="fbtn" onclick="filterQ(this,'safety')">⛑️ 안전</div>
-          <div class="fbtn" onclick="filterQ(this,'hiking')">🏔️ 등산</div>
-          <div class="fbtn" onclick="filterQ(this,'nutrition')">🥗 영양</div>
-          <div class="fbtn" onclick="filterQ(this,'gear')">🔧 장비</div>
+          <div class="fbtn fbtn-area" onclick="filterQ(this,'rule')">📋 대회규정</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'rule_general')">일반규정</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'rule_safety')">경기안전</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'rule_event')">종목별규정</div>
+          <div class="fbtn fbtn-area" onclick="filterQ(this,'safety')">⛑️ 안전</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'safety_risk')">위험구분</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'safety_hiking')">등산사고</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'safety_climbing')">클라이밍사고</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'safety_response')">대처방안</div>
+          <div class="fbtn fbtn-area" onclick="filterQ(this,'climbing')">🧗 클라이밍지도</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'climbing_concept')">개념·역사</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'climbing_skill')">신체기술</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'climbing_gear')">장비기준</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'climbing_grade')">그레이드</div>
+          <div class="fbtn fbtn-area" onclick="filterQ(this,'hiking')">🏔️ 일반등산지도</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'hiking_concept')">산행개념</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'hiking_energy_save')">에너지절약</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'hiking_energy_gen')">에너지생성</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'hiking_gear')">필수장비</div>
         </div>
         <div id="qcount" style="font-size:12px;color:var(--text-sub);margin-bottom:.75rem"></div>
         <div id="practice-list"></div>
@@ -624,8 +645,18 @@
     </div>
 
     <script>
-      const CAT = { climbing: '클라이밍', rule: '경기규정', safety: '안전·사고', hiking: '등산', nutrition: '영양', gear: '장비' };
-      const BADGE = { climbing: 'b-c', rule: 'b-r', safety: 'b-s', hiking: 'b-h', nutrition: 'b-n', gear: 'b-g' };
+      const CAT = {
+        rule_general:'일반규정', rule_safety:'경기안전규정', rule_event:'종목별규정',
+        safety_risk:'위험구분', safety_hiking:'등산사고', safety_climbing:'클라이밍사고', safety_response:'대처방안',
+        climbing_concept:'개념·역사', climbing_skill:'신체기술', climbing_gear:'장비기준', climbing_grade:'그레이드',
+        hiking_concept:'산행개념', hiking_energy_save:'에너지절약', hiking_energy_gen:'에너지생성', hiking_gear:'필수장비'
+      };
+      const BADGE = {
+        rule_general:'b-r', rule_safety:'b-r', rule_event:'b-r',
+        safety_risk:'b-s', safety_hiking:'b-s', safety_climbing:'b-s', safety_response:'b-s',
+        climbing_concept:'b-c', climbing_skill:'b-c', climbing_gear:'b-c', climbing_grade:'b-c',
+        hiking_concept:'b-h', hiking_energy_save:'b-h', hiking_energy_gen:'b-h', hiking_gear:'b-h'
+      };
 
       const scores = {};      
       let examData = [];
@@ -693,7 +724,8 @@
 
       function renderPractice(cat = 'all') {
         currentCat = cat;
-        const list = cat === 'all' ? QA : QA.filter(q => q.cat === cat);
+        const AREA_CATS = ['rule','safety','climbing','hiking'];
+        const list = cat === 'all' ? QA : AREA_CATS.includes(cat) ? QA.filter(q => q.cat.startsWith(cat + '_')) : QA.filter(q => q.cat === cat);
         document.getElementById('qcount').textContent = `총 ${list.length}문제`;
         document.getElementById('practice-list').innerHTML = list.map((item) => {
           const gi = QA_ORIG.indexOf(item); // 원본 인덱스 사용
