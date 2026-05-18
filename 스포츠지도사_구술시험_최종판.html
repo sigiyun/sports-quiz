@@ -204,14 +204,9 @@
     .filter-scroll {
       display: flex;
       gap: 6px;
-      overflow-x: auto;
-      scrollbar-width: none;
+      flex-wrap: wrap;
       padding-bottom: 4px;
       margin-bottom: 1rem
-    }
-
-    .filter-scroll::-webkit-scrollbar {
-      display: none
     }
 
     .fbtn {
@@ -233,6 +228,19 @@
       color: #fff;
       border-color: var(--p);
       font-weight: 500
+    }
+
+    .fbtn-area {
+      background: var(--pd);
+      color: #fff;
+      border-color: var(--pd);
+      font-weight: 700;
+      margin-left: 4px
+    }
+
+    .fbtn-area.on {
+      background: var(--p);
+      border-color: var(--p)
     }
 
     /* 카드 */
@@ -743,13 +751,25 @@
         </div>
         <div class="filter-scroll">
           <div class="fbtn on" onclick="filterQ(this,'all')">전체</div>
-          <div class="fbtn" onclick="filterQ(this,'climbing')">🧗 클라이밍</div>
-          <div class="fbtn" onclick="filterQ(this,'rule')">📋 경기규정</div>
-          <div class="fbtn" onclick="filterQ(this,'safety')">⛑️ 안전</div>
-          <div class="fbtn" onclick="filterQ(this,'hiking')">🏔️ 등산</div>
-          <div class="fbtn" onclick="filterQ(this,'nutrition')">🥗 영양</div>
-          <div class="fbtn" onclick="filterQ(this,'gear')">🔧 장비</div>
-          <div class="fbtn" onclick="filterQ(this,'teach')">📖 지도법</div>
+          <div class="fbtn fbtn-area" onclick="filterQ(this,'rule')">📋 대회규정</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'rule_general')">일반규정</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'rule_safety')">경기안전</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'rule_event')">종목별규정</div>
+          <div class="fbtn fbtn-area" onclick="filterQ(this,'safety')">⛑️ 안전</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'safety_risk')">위험구분</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'safety_hiking')">등산사고</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'safety_climbing')">클라이밍사고</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'safety_response')">대처방안</div>
+          <div class="fbtn fbtn-area" onclick="filterQ(this,'climbing')">🧗 클라이밍지도</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'climbing_concept')">개념·역사</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'climbing_skill')">신체기술</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'climbing_gear')">장비기준</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'climbing_grade')">그레이드</div>
+          <div class="fbtn fbtn-area" onclick="filterQ(this,'hiking')">🏔️ 일반등산지도</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'hiking_concept')">산행개념</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'hiking_energy_save')">에너지절약</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'hiking_energy_gen')">에너지생성</div>
+          <div class="fbtn fbtn-sub" onclick="filterQ(this,'hiking_gear')">필수장비</div>
         </div>
         <div id="qcount" style="font-size:12px;color:var(--ts);margin-bottom:.75rem"></div>
         <div id="qlist"></div>
@@ -759,13 +779,33 @@
           <span>범위</span>
           <select id="qcat">
             <option value="all">전체</option>
-            <option value="climbing">클라이밍</option>
-            <option value="rule">경기규정</option>
-            <option value="safety">안전</option>
-            <option value="hiking">등산</option>
-            <option value="nutrition">영양</option>
-            <option value="gear">장비</option>
-            <option value="teach">지도법</option>
+            <optgroup label="📋 대회규정">
+              <option value="rule">대회규정 전체</option>
+              <option value="rule_general">일반규정</option>
+              <option value="rule_safety">경기안전규정</option>
+              <option value="rule_event">종목별규정</option>
+            </optgroup>
+            <optgroup label="⛑️ 안전">
+              <option value="safety">안전 전체</option>
+              <option value="safety_risk">위험구분</option>
+              <option value="safety_hiking">등산사고</option>
+              <option value="safety_climbing">클라이밍사고</option>
+              <option value="safety_response">대처방안</option>
+            </optgroup>
+            <optgroup label="🧗 클라이밍지도">
+              <option value="climbing">클라이밍 전체</option>
+              <option value="climbing_concept">개념·역사</option>
+              <option value="climbing_skill">신체기술</option>
+              <option value="climbing_gear">장비기준</option>
+              <option value="climbing_grade">그레이드</option>
+            </optgroup>
+            <optgroup label="🏔️ 일반등산지도">
+              <option value="hiking">일반등산 전체</option>
+              <option value="hiking_concept">산행개념</option>
+              <option value="hiking_energy_save">에너지절약</option>
+              <option value="hiking_energy_gen">에너지생성</option>
+              <option value="hiking_gear">필수장비</option>
+            </optgroup>
           </select>
           <span>문제 수</span>
           <select id="qnum">
@@ -787,8 +827,18 @@
 
   <script src="questions.js"></script>
   <script>
-    const CAT = { climbing: '클라이밍', rule: '경기규정', safety: '안전·사고', hiking: '등산', nutrition: '영양', gear: '장비', teach: '지도법' };
-    const BDGE = { climbing: 'bc', rule: 'br', safety: 'bs', hiking: 'bh', nutrition: 'bn', gear: 'bt', teach: 'bg2' };
+    const CAT = {
+      rule_general:'일반규정', rule_safety:'경기안전규정', rule_event:'종목별규정',
+      safety_risk:'위험구분', safety_hiking:'등산사고', safety_climbing:'클라이밍사고', safety_response:'대처방안',
+      climbing_concept:'개념·역사', climbing_skill:'신체기술', climbing_gear:'장비기준', climbing_grade:'그레이드',
+      hiking_concept:'산행개념', hiking_energy_save:'에너지절약', hiking_energy_gen:'에너지생성', hiking_gear:'필수장비'
+    };
+    const BDGE = {
+      rule_general:'br', rule_safety:'br', rule_event:'br',
+      safety_risk:'bs', safety_hiking:'bs', safety_climbing:'bs', safety_response:'bs',
+      climbing_concept:'bc', climbing_skill:'bc', climbing_gear:'bc', climbing_grade:'bc',
+      hiking_concept:'bh', hiking_energy_save:'bh', hiking_energy_gen:'bh', hiking_gear:'bh'
+    };
     const FB = 'https://sports-quiz-60fae-default-rtdb.firebaseio.com';
     const CODES = {
       'kim-4493': '김진호',
@@ -902,9 +952,10 @@
 
     function renderQBank(cat) {
       curCat = cat;
-      const list = cat === 'all' ? QA : QA.filter(q => q.cat === cat);
+      const AREA_CATS = ['rule','safety','climbing','hiking'];
+      const list = cat === 'all' ? QA : AREA_CATS.includes(cat) ? QA.filter(q => q.cat.startsWith(cat + '_')) : QA.filter(q => q.cat === cat);
       const total = list.length;
-      const knownN = [...knownSet].filter(i => cat === 'all' || QA[i] && QA[i].cat === cat).length;
+      const knownN = [...knownSet].filter(i => cat === 'all' || (QA[i] && (AREA_CATS.includes(cat) ? QA[i].cat.startsWith(cat + '_') : QA[i].cat === cat))).length;
       const pct = total > 0 ? Math.round(knownN / total * 100) : 0;
       document.getElementById('know-stat').textContent = '학습 진도: ' + knownN + ' / ' + total + ' (' + pct + '%)';
       document.getElementById('know-fill').style.width = pct + '%';
@@ -954,7 +1005,8 @@
       const cat = document.getElementById('qcat').value;
       const num = parseInt(document.getElementById('qnum').value);
       const skip = document.getElementById('skip-known').checked;
-      let pool = cat === 'all' ? [...QA] : QA.filter(q => q.cat === cat);
+      const _AC = ['rule','safety','climbing','hiking'];
+      let pool = cat === 'all' ? [...QA] : _AC.includes(cat) ? QA.filter(q => q.cat.startsWith(cat + '_')) : QA.filter(q => q.cat === cat);
       if (skip) pool = pool.filter(item => !knownSet.has(QA_ORIG.indexOf(item)));
       if (pool.length === 0) { document.getElementById('quiz-wrap').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--ts)">모든 문제를 알고 있어요! 초기화 후 다시 도전하세요.</div>'; return; }
       qData = pool.sort(() => Math.random() - .5).slice(0, Math.min(num, pool.length));
